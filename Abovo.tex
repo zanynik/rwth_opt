@@ -1,12 +1,12 @@
 \documentclass[english]{article}
-\usepackage[T1]{fontenc}
-\usepackage[latin9]{inputenc}
-\usepackage{color}
 \usepackage{babel}
+\usepackage{blindtext}
+\usepackage{microtype}
+\usepackage{color}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{ragged2e}
-\justifying
+
 \begin{document}
 
 \title{\Large{\textbf{Air Cargo Optimization}}}
@@ -17,14 +17,28 @@
 
 \begin{flushleft}
 \textbf{\underline{\large{Introduction}}}:
+$\newline$
 
-Unit Load Devices (ULDs) are unloaded from an aircraft by the ground handling agent and placed in their respective drop zones. Each ULD has an arrival time. From the drop zone the ULDs need to be transported to a breakdown zone (BD zone), which are located at different places of the airport, have different capacity and handling times within the zone.
+An Airport needs to plan the cargo movement so that all shipments catch their connecting flights (or road connection). Air cargo shipments are transported in so-called unit load devices (ULDs). A ULD contains many shipments which need to go to different destinations and hence the incoming ULDs are broken down and re-built according to the flights the shipments have to catch. The goal of the optimization proccess is buildup all ULDs as soon as possible to make the connections
+
+$\newline$
+\textbf{\underline{\large{Process description}}}:
+$\newline$
+
+ULDs are unloaded from an aircraft by the ground handling agent and placed in their respective drop zones. Each ULD has an arrival time. From the drop zone the ULDs need to be transported to a breakdown zone (BD zone), which are located at different places of the airport, have different capacity and handling times within the zone.
+
 
 \noindent\includegraphics[width=13cm]{1_process.png}\qquad
 
+$\newline$
+Within the BD zone the decision needs to be taken in which order the ULDs should be unpacked.  ULDs need to be broken down early enough, so all shipments can make their connections or promised pick-up time. When the shipments are unpacked, they are sent to the storage warehouse (WH) which is fully automated and with the assumption, that there are never capacity issues in the storage WH.
+$\newline$
 
 
+In the next step the shipments are built up again to ULDs depending on their connecting flight. This is done within a buildup zone (BU zone). A departing aircraft type has a link to a specific BU zone. As soon as enough stock is available in the storage WH to build up one ULD for a specific aircraft, these can be requested to be provided to the BU zone.
+$\newline$
 
+Each BU zone consists of multiple work stations. At each work station one ULD can be built up at the same time. The shipments are provided from the storage WH to the chosen workstation. If the building up of two ULDs for the same aircraft are planned at one work station, it is not allowed to build up a ULD for a different aircraft in between, even if there is some idle time.
 $\newline$
 
 \noindent\includegraphics[width=13cm]{Aircargo_overall.png}\qquad
@@ -161,6 +175,13 @@ $\textcolor{black}{\displaystyle \sum_{i\in I} \sum_{l\in L} \sum_{k\in K}Y_{i,k
 All shipments of flight k, should reach be available before time $\textcolor{black}{W_{k}}$:
 
 $\textcolor{black}{a_{i}+s_{i}+{\displaystyle \sum_{i,j\in E}x_{i,j}T_{j}}}+{T_{j}^{\prime}}+{H_{j}}$ $\leq$ ${W_{k}}$ + (1-${Y_{i,k}^{l}}$)M, $\forall{i,k,l}$ // Time constraint for every shipment.
+
+$\newline$
+
+\textbf{\large{Objective Function}}: Minimizing the maximum slack
+$\newline$
+
+$\textcolor{black}{Min(Max(  s_{i}}+{W_{k}}$))
 
 \end{flushleft}
 
