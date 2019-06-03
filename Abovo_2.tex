@@ -150,23 +150,48 @@ In a next step the shipments are built up again to ULDs depending on their conne
 \begin{itemize}
 	\item Different handling times and transport times from the WH for each BU zone.
 	
-	$\newline$
-	\noindent\includegraphics[width=14cm]{buzone_data1.png}\qquad
-	
+	\begin{figure}[hbt!]
+		\centering
+		\includegraphics[width=100mm,scale=1.5]{buzone_data1.png}
+	\end{figure}
+
+\end{itemize}
+
+	%%\noindent\includegraphics[width=14cm]{buzone_data1.png}\qquad
+
+\begin{itemize}
+
 	\item Sample workstations within some BU zones.
 	
-	$\newline$
-	\noindent\includegraphics[width=8cm]{sample_ws_bu.png}\qquad
-	
+	\begin{figure}[hbt!]
+		\centering
+		\includegraphics[width=40mm,scale=1.0]{sample_ws_bu.png}
+	\end{figure}
+	%%\noindent\includegraphics[width=8cm]{sample_ws_bu.png}\qquad
+
+\end{itemize}
+
+\begin{itemize}
+
 	\item Sample flights related to some BU zones and the transportation time between the flight and the BU zone.
 	
-	$\newline$
-	\noindent\includegraphics[width=10cm]{sample_bu_flight.png}\qquad
-	
+	\begin{figure}[hbt!]
+		\centering
+		\includegraphics[width=90mm,scale=1.5]{sample_bu_flight.png}
+	\end{figure}
+	%%\noindent\includegraphics[width=10cm]{sample_bu_flight.png}\qquad
+
+\end{itemize}
+
+\begin{itemize}
+
 	\item Pre-processing buffer times for the flights.
 	
-	$\newline$
-	\noindent\includegraphics[width=10cm]{preprocess_time.png}\qquad
+	\begin{figure}[hbt!]
+		\centering
+		\includegraphics[width=90mm,scale=1.5]{preprocess_time.png}
+	\end{figure}
+	%%\noindent\includegraphics[width=10cm]{preprocess_time.png}\qquad
 	
 \end{itemize}
 
@@ -177,7 +202,7 @@ The goal is to build up all ULDs as soon as possible to make the connections, wh
 \section{Mathematical Model for the Problem}
 \label{sec:mathmodel}
 
-Our model is consisted of two parts of the puzzle: Break Down Zone and the Build Up Zone. According to this, the model has different parameters, decision variables, constraints and objective function components for different zones.
+Our mathematical model for this problem is a combination of two parts of the puzzle which are Break Down Zone and the Build Up Zone. According to this, the model has different parameters, decision variables, constraints and objective function components for different zones and we treated the problem first as seperate models. At the end, overall model can be seen with both puzzles included. 
 
 $\newline$ 
 
@@ -187,7 +212,7 @@ $\newline$
 \end{figure}
 
 
-\subsection{Parameters for Break Down Process}
+\subsection{Break Down Process}
 \label{sec:ParamBDZone}
 
 In BD zones, our model has arrival time, priority and idle time parameters for each ULD. Similar to this, each BD zone has its own capacity, handling time and transportation time from drop zone. Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J.
@@ -210,7 +235,7 @@ $\textcolor{black}{t_{j}}$ : Time taken to transport an ULD to BD zone ${\color{
 
 $\newline$
 
-\subsection{Decision Variable for Break Down Process}
+\subsubsection{Decision Variable for Break Down Process}
 \label{sec:DVBDZone}
 
 In the Break Down zone, the decision needs to be taken which ULDs should be assigned to which BD zone. For this reason, the decision variable has to be binary. 1 for the ULD i is assigned to BD zone j, 0 for the ULD i is not assigned to BD zone j.
@@ -219,48 +244,111 @@ $\newline$
 
 $\textcolor{black}{x_{ij}\in\{0,1\}, \forall {i \in I, j \in J}}$ : if a ULD i is assigned to BD zone j or not
 
+$\newline$
+
+\subsubsection{Constraints for Break Down Process}
+\label{sec:constraintsBDZone}
+
+For BD processes we have two constraints. The first one of them (1) is the capacity constraint and the second one (2) is the assignment constraint which means all ULDs have to be assigned to exactly one BD zone. 
+
+
+\begin{align}
+\sum_{i \in {I}} x_{ij} \le c_{j} \qquad \forall j \in J 
+\end{align}
+\begin{align}
+\sum_{j \in {J}} x_{ij} = 1 \qquad \forall i \in I 
+\end{align}
+
+$\newline$
+
+\subsubsection{Objective Function for Break Down Process}
+\label{sec:objBDZone}
+
+During the whole BD zone process, the goal is to minimize the BD zone end time for ULDs. If a ULD is assigned for the BD zone, the total time has to be calculated for that. This means total process time of one ULD i from drop zone to the end of the BD zone. For calculating this, waiting time in drop zone which is the idle time parameter, handling time and transportation time from the drop zone have to be considered if that ULD is assigned. Then we need to consider all ULDs.
+
+$\newline$
+
+Basically, this is the total process time for one ULD:
+$\newline$
+
+ ${\color{black}{s_{i}}}$ + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}}}$
+
+$\newline$
+We are trying to minimize this statement above for all ULDs. Then this is the objective function for BD zone: 
+$\newline$
+
+\begin{equation*}
+	\min {} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij} + h_{j}x_{ij})
+\end{equation*} 
+
+%$\textcolor{black}{s_{i}}$  + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}}}$
+
+
+$\newline$
+
+At this phase, priorities are not considered in our model in BD zones.
+
+$\newline$
+
+\subsection{Build Up Process}
+\label{sec:ParamBUZone}
+
+During BU process, our model has several parameters for both of the flights and the time horizons. 
+
+\begin{equation*} ${\color{black} flight k}$ {}  \in {}  ${\color{black}K}$ {} = {} ${\color{black}\{1,2,3,...,K\}}$  \end{equation*} 
+\begin{equation*} ${\color{black} time horizon t}$ {}  \in {}  ${\color{black}T}$ {} = {} ${\color{black}\{1,2,3,...,T\}}$ \end{equation*} 
+
+The first constraint is about available weight for a given time t and for a flight k which means the summation of the weights of the seperate shipments which are raedy to build up and waiting in the warehouse.
+
+
+The second one is the due time of the build up process for a flight k.
+
+The third one is the total shipment weight as a demand for a flight k.
+
+The fourth one is 
+
 ------------------------------------------------------------------------
 
 \pagebreak
 
 \begin{table}[h!]
-  \begin{center}
-    \caption{Drop Zone}
-    \label{tab:table1}
-    \begin{tabular}{l|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      \textbf{Name} & \textbf{Workstations} & \textbf{Sequence}\\
-      \hline
-       & & \\
-      DZ NRML-1 & 6 & 1\\
-      DZ NRML-2 & 4 & 2\\
-      DZ NML-1 & 3 & 3\\
-      DZ CLD-1 & 5 & 4\\
-    \end{tabular}
-  \end{center}
+	\begin{center}
+		\caption{Drop Zone}
+		\label{tab:table1}
+		\begin{tabular}{l|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+			\textbf{Name} & \textbf{Workstations} & \textbf{Sequence}\\
+			\hline
+			& & \\
+			DZ NRML-1 & 6 & 1\\
+			DZ NRML-2 & 4 & 2\\
+			DZ NML-1 & 3 & 3\\
+			DZ CLD-1 & 5 & 4\\
+		\end{tabular}
+	\end{center}
 \end{table}
 
 \begin{table}[h!]
-  \begin{center}
-    \caption{Break Down Zone}
-    \label{tab:table1}
-    \begin{tabular}{l|c|c|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      \textbf{Name} & \textbf{Workstations} & \textbf{Sequence} & \textbf{ToWH} & \textbf{HandTimePerULD}\\
-      \hline
-       & & & & \\
-      B BD NRML-1 & 33 & 1 & 0:30 & 0:24\\
-      B BD NRML-2 & 10 & 2 &  0:25 & 0:24\\
-      BD NML-1 & 4 & 3 &  0:40 & 0:13\\
-      BD CLD-1 & 8 & 4  &  0:30 & 0:17\\
-      BD NRML-1 & 5 & 5  &  0:30 & 0:20\\
-      BD NML-2 & 3 & 6  & 0:25 & 0:13\\
-      BD NRML-2 & 6 & 7  & 0:40 & 0:20\\
-      BD NRML-3 & 3 & 8  & 0:40 & 0:20\\
-      BD CLD-2 & 5 & 9  & 0:30 & 0:17\\
-      BD NML-3 & 5 & 10  & 0:25 & 0:20\\
-      BD NRML-4 & 3 & 11  & 0:30 & 0:13\\
-      BD CLD-4 & 1 & 12  & 0:40 & 0:15\\
-    \end{tabular}
-  \end{center}
+	\begin{center}
+		\caption{Break Down Zone}
+		\label{tab:table1}
+		\begin{tabular}{l|c|c|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+			\textbf{Name} & \textbf{Workstations} & \textbf{Sequence} & \textbf{ToWH} & \textbf{HandTimePerULD}\\
+			\hline
+			& & & & \\
+			B BD NRML-1 & 33 & 1 & 0:30 & 0:24\\
+			B BD NRML-2 & 10 & 2 &  0:25 & 0:24\\
+			BD NML-1 & 4 & 3 &  0:40 & 0:13\\
+			BD CLD-1 & 8 & 4  &  0:30 & 0:17\\
+			BD NRML-1 & 5 & 5  &  0:30 & 0:20\\
+			BD NML-2 & 3 & 6  & 0:25 & 0:13\\
+			BD NRML-2 & 6 & 7  & 0:40 & 0:20\\
+			BD NRML-3 & 3 & 8  & 0:40 & 0:20\\
+			BD CLD-2 & 5 & 9  & 0:30 & 0:17\\
+			BD NML-3 & 5 & 10  & 0:25 & 0:20\\
+			BD NRML-4 & 3 & 11  & 0:30 & 0:13\\
+			BD CLD-4 & 1 & 12  & 0:40 & 0:15\\
+		\end{tabular}
+	\end{center}
 \end{table}
 
 \pagebreak
@@ -269,7 +357,11 @@ $\textcolor{black}{x_{ij}\in\{0,1\}, \forall {i \in I, j \in J}}$ : if a ULD i i
 
 Let each ULD ${\color{black}i\in{\color{black}I = \{1,2,3,\dots,n\}}}$
 
+${\color{black}a_{i}}$ - Arrival time of each ULD ${\color{black}i}$
 
+$\textcolor{black}{s_{i}}$ - Idle time spent by ULD i at drop zone
+
+$\textcolor{black}{p_{i}}$ - Priority of ULD i
 
 $\newline$
 
