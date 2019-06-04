@@ -298,14 +298,88 @@ During BU process, our model has several parameters for both of the flights and 
 \begin{equation*} ${\color{black} flight k}$ {}  \in {}  ${\color{black}K}$ {} = {} ${\color{black}\{1,2,3,...,K\}}$  \end{equation*} 
 \begin{equation*} ${\color{black} time horizon t}$ {}  \in {}  ${\color{black}T}$ {} = {} ${\color{black}\{1,2,3,...,T\}}$ \end{equation*} 
 
+$\newline$
+
 The first constraint is about available weight for a given time t and for a flight k which means the summation of the weights of the seperate shipments which are raedy to build up and waiting in the warehouse.
 
+$\newline$
+
+$avail_{kt}$ $\in$ $\mathbb{R}$
+
+$\newline$
 
 The second one is the due time of the build up process for a flight k.
 
+$\newline$
+
+$due_{k}$ $\in$ $\mathbb{R}$
+
+$\newline$
+
 The third one is the total shipment weight as a demand for a flight k.
 
-The fourth one is 
+$\newline$
+
+$dem_{k}$ $\in$ $T$
+
+$\newline$
+
+The fourth one is the maximum number of ULDs building up simultaneously for a flight k. It actually means number of workstations which are working parallel. In practice we only want to build a limited number of ULDs for the same flight at the same time. This leaves more options and time to react to operational problems during build up and allows to build the ULDs on close-by workstations. Let maximum split denote the maximum desired number of parallel build-ups of a flight. Enforcing a hard limit in practice might lead to offloads for flights where the shipment arrives rather late such that the limit is too low to build all ULDs on time. In these cases we want to set a less restrictive limit.
+
+$\newline$
+
+As a suitable limit we choose the maximum required parallel build-ups, between any build-up period and the scheduled departure period of the flight, for which all shipments can be packed. For each period t, we determine the shipment weight arriving in the future (weight demand of flight k) $-$ (available weight at time t for flight k) and the weight that could be packed in the remaining time, if no parallel build-ups are allowed. Note that the number of ULDs that can be built sequentially in the time between t and due time for flight k, can be determined as (due date of flight k $-$ t $-$ 1) $/$ (duration to build a ULD for a flight k). The ratio of both gives us the required parallelism and its maximum over the periods the sought limit. If the required parallelism is less than the desired maximum split, we allow maximum split to be built in parallel.
+
+$\newline$
+
+$split_{k}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+The fifth parameter is the number of ULDs scheduled for a flight k. It means that total shipment weight for a flight k is divided into capacity which is 400 kg and gives us the valueof the parameter. 
+
+$\newline$
+
+$uld_{k}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+The sixth one is the duration in minutes for building a ULD for flight k. We actually know which BU zone is used for flight k before, that is why we do not consider here BU zone index.
+
+$\newline$
+
+$dur_{k}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+The seventh one is the weight of an ULD which is 400 kg as stated in the data.
+
+$\newline$
+
+$cap$ $\in$ $\mathbb{R}$
+
+$\newline$
+
+The last one is the number of workstations handling the ULDs during time t. It is for all flights in time horizon t.
+
+$\newline$
+
+$open_{t}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+
+\subsubsection{Decision Variables for Build Up Process}
+\label{sec:DVBUZone}
+
+\subsubsection{Constraints for Build Up Process}
+\label{sec:constraintsBUZone}
+
+\subsubsection{Objective Function for Build Up Process}
+\label{sec:objBUZone}
+
+\subsection{Overall Model}
+\label{sec:overallModel}
 
 ------------------------------------------------------------------------
 
