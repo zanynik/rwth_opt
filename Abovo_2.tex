@@ -95,8 +95,9 @@
 \author{Ilkim Canoler \\ Luckshan Sivakumar \\  Nikhil Kulkarni \\ Karthikeyan Ramasubbu \\ Shekhar Dure}
 $\newline$
 $\newline$
-\date{28th May 2019}
+\date{12th June 2019}
 \maketitle
+\thispagestyle{empty}
 
 
 $\newline$
@@ -104,6 +105,13 @@ $\newline$
 	In this study, an operational planning problem in the air cargo industry is being tried to be solved. For all shipments in an international airline hub that need to catch their related flight on time, a mathematical model was constructed.  Working with our industrial partner AbOvo, we formalize the problem constraints and our objective. Besides, the necessary data is collected from AbOvo and we started working on it simultaneously. We are trying to establish a comprehensive view of tasks in an air cargo terminal and develop a suitable solution apporoach. Furthermore, our goal is to solve this model by using Gurobi solver as a full planning puzzle. In this paper, all explanations and details about our mathematical model and the data we have, can be found.
 	
 \end{abstract}
+
+\clearpage
+\pagenumbering{arabic} 
+
+\newpage
+
+\tableofcontents
 
 \newpage
 
@@ -171,6 +179,8 @@ In a next step the shipments are built up again to ULDs depending on their conne
 
 \end{itemize}
 
+\newpage
+
 \begin{itemize}
 
 	\item Sample flights related to some BU zones and the transportation time between the flight and the BU zone.
@@ -219,6 +229,7 @@ In BD zones, our model has arrival time, priority and idle time parameters for e
 
 \begin{equation*} ${\color{black} ULD i}$ {}  \in {}  ${\color{black}I}$ {} = {} ${\color{black}\{1,2,3,...,N\}}$  \end{equation*} 
 \begin{equation*} ${\color{black} BD zone j}$ {}  \in {}  ${\color{black}J}$ {} = {} ${\color{black}\{1,2,3,...,M\}}$ \end{equation*} 
+\begin{equation*} ${\color{black} Time horizon t}$ {}  \in {}  ${\color{black}T}$ {} = {} ${\color{black}\{1,2,3,...,T\}}$ \end{equation*} 
 
 
 ${\color{black}a_{i}}$ : Arrival time of ULD ${\color{black}i}$ in drop zone 
@@ -235,29 +246,50 @@ $\textcolor{black}{t_{j}}$ : Time taken to transport an ULD to BD zone ${\color{
 
 $\newline$
 
-\subsubsection{Decision Variable for Break Down Process}
+\subsubsection{Decision Variables for Break Down Process}
 \label{sec:DVBDZone}
 
-In the Break Down zone, the decision needs to be taken which ULDs should be assigned to which BD zone. For this reason, the decision variable has to be binary. 1 for the ULD i is assigned to BD zone j, 0 for the ULD i is not assigned to BD zone j.
+In the Break Down zone, the decision needs to be taken which ULDs should be assigned to which BD zone at which time. For this reason, the decision variable has to be binary. 1 for the ULD i is assigned to BD zone j at time t, 0 for the ULD i is not assigned to BD zone j at time t. 
 
 $\newline$
 
-$\textcolor{black}{x_{ij}\in\{0,1\}, \forall {i \in I, j \in J}}$ : if a ULD i is assigned to BD zone j or not
+$\textcolor{black}{x_{ij}^{t}\in\{0,1\}, \forall {i \in I, j \in J}}$ : if a ULD i is assigned to BD zone j or not at time t
 
 $\newline$
 
 \subsubsection{Constraints for Break Down Process}
 \label{sec:constraintsBDZone}
 
-For BD processes we have two constraints. The first one of them (1) is the capacity constraint and the second one (2) is the assignment constraint which means all ULDs have to be assigned to exactly one BD zone. 
+For BD processes we have several constraints. The first one (1) is the capacity constraint and the second one (2) is the assignment constraint which means all ULDs have to be assigned to exactly one BD zone. 
 
 
 \begin{align}
-\sum_{i \in {I}} x_{ij} \le c_{j} \qquad \forall j \in J 
+\sum_{i \in {I}} x_{ij}^{t} \le c_{j} \qquad \forall j \in J, \forall t \in T 
 \end{align}
 \begin{align}
-\sum_{j \in {J}} x_{ij} = 1 \qquad \forall i \in I 
+\sum_{j \in {J}} x_{ij}^{t} = 1 \qquad \forall i \in I, \forall t \in T
 \end{align}
+
+$\newline$
+
+The third constraint (3) mentions that each ULD has to be processed. 
+
+\begin{align}
+\sum_{j \in J}\sum_{t=1}^{T-h_{j}+1} x_{ij}^{t} = 1 \qquad \forall i \in I
+\end{align}
+
+$\newline$
+
+As a last constraint (4), we can say that if ULD i is started to be processed at time t, no other job can start before $t + h_{j}$. Because the process of the current ULD needs to be completed. If ULD i starts at t in BD zone j, other ULDs are in the set of $u \in I 	\setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the ULDs which are processed and completed. For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
+
+
+\begin{align}
+c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau = t}^{t+h_{j}-1} x_{ij}^{\tau} \qquad \forall t \in T, \forall j \in J
+\end{align}
+
+$\newline$
+
+The effect is no two ULDs run in parallel. For the objective funciton we need to know the ULD starting times. Here, starting time of ULD i is $t_{i} = \sum_{t=0}^{T-h_{j}+1} t x_{it} $.
 
 $\newline$
 
@@ -271,14 +303,14 @@ $\newline$
 Basically, this is the total process time for one ULD:
 $\newline$
 
- ${\color{black}{s_{i}}}$ + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}}}$
+ ${\color{black}{s_{i}}}$ + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}^{t}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}^{t}}}$
 
 $\newline$
 We are trying to minimize this statement above for all ULDs. Then this is the objective function for BD zone: 
 $\newline$
 
 \begin{equation*}
-	\min {} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij} + h_{j}x_{ij})
+	\min \qquad \sum_{t \in T} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij}^{t} + h_{j}x_{ij}^{t})
 \end{equation*} 
 
 %$\textcolor{black}{s_{i}}$  + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}}}$
@@ -295,8 +327,8 @@ $\newline$
 
 During BU process, our model has several parameters for both of the flights and the time horizons. 
 
-\begin{equation*} ${\color{black} flight k}$ {}  \in {}  ${\color{black}K}$ {} = {} ${\color{black}\{1,2,3,...,K\}}$  \end{equation*} 
-\begin{equation*} ${\color{black} time horizon t}$ {}  \in {}  ${\color{black}T}$ {} = {} ${\color{black}\{1,2,3,...,T\}}$ \end{equation*} 
+\begin{equation*} ${\color{black} Flight k}$ {}  \in {}  ${\color{black}K}$ {} = {} ${\color{black}\{1,2,3,...,K\}}$  \end{equation*} 
+\begin{equation*} ${\color{black} Time horizon t}$ {}  \in {}  ${\color{black}T}$ {} = {} ${\color{black}\{1,2,3,...,T\}}$ \end{equation*} 
 
 $\newline$
 
@@ -326,7 +358,6 @@ $\newline$
 
 The fourth one is the maximum number of ULDs building up simultaneously for a flight k. It actually means number of workstations which are working parallel. In practice we only want to build a limited number of ULDs for the same flight at the same time. This leaves more options and time to react to operational problems during build up and allows to build the ULDs on close-by workstations. Let maximum split denote the maximum desired number of parallel build-ups of a flight. Enforcing a hard limit in practice might lead to offloads for flights where the shipment arrives rather late such that the limit is too low to build all ULDs on time. In these cases we want to set a less restrictive limit.
 
-$\newline$
 
 As a suitable limit we choose the maximum required parallel build-ups, between any build-up period and the scheduled departure period of the flight, for which all shipments can be packed. For each period t, we determine the shipment weight arriving in the future (weight demand of flight k) $-$ (available weight at time t for flight k) and the weight that could be packed in the remaining time, if no parallel build-ups are allowed. Note that the number of ULDs that can be built sequentially in the time between t and due time for flight k, can be determined as (due date of flight k $-$ t $-$ 1) $/$ (duration to build a ULD for a flight k). The ratio of both gives us the required parallelism and its maximum over the periods the sought limit. If the required parallelism is less than the desired maximum split, we allow maximum split to be built in parallel.
 
@@ -372,155 +403,114 @@ $\newline$
 \subsubsection{Decision Variables for Build Up Process}
 \label{sec:DVBUZone}
 
+The primary decision made by the model is the number of ULDs to start building at each
+period. To calculate the objective value, we introduce further decision variables. One
+part of the objective is to load as much as possible. There are two reasons that might
+prevent us from achieving this goal: First, if not all ULDs can be scheduled for build-up.
+Second, if a ULD is scheduled before enough shipment is available. We capture the effect of
+each reason in one variable.
+
+$\newline$
+
+$\textcolor{black}{start_{kt}\in\mathbb{N}, \forall {k \in K, t \in T}}$ : Number of ULDs started to build at time t for a flight k $t \le due_{k} $ - $dur_{k}$
+
+$\newline$
+
+$\textcolor{black}{offload_{k}\in\mathbb{N}, \forall {k \in K}}$ : Number of NOT scheduled ULDs for flight k
+
+
+$\newline$
+
+$\textcolor{black}{dead_{kt}\in\mathbb{R} \ge 0, \forall {k \in K, t \in T}}$ : Lost weight of shipments on flight k if ULDs are built before enough shipments available at time t
+
+
+$\newline$
+
 \subsubsection{Constraints for Build Up Process}
 \label{sec:constraintsBUZone}
+
+There is no technical reason to restrict the number of ULDs that are
+built in parallel for a segment. However, in practice there might occur problems during
+a build-up when an item cannot be packed onto the planned ULD. In this case, the load
+planner has to find another ULD with enough remaining capacity under massive time
+pressure. The more ULDs that are not started yet, the more options and time he has
+for replanning. Furthermore, if only a few ULDs for a segment are built in parallel, they
+can be assigned to spatially close workstations. This might reduce transport distances
+and improve overview during build-up. We note that, during a period t, the ULDs that
+were started during period (t $-$ $dur_{k}$ $+$ 1) to period t are still work in progress. For each flight k we limit the number of simultaneously built ULDs by splitk as:
+
+\begin{align}
+\sum_{t' \in {T}} start_{kt'} \le split_{k} \qquad \forall k \in K, \forall t \in T
+\end{align} $t - dur_{k} \le t' \le t$
+
+$\newline$
+
+The number of usable workstations is limited. As each workstation
+can process one ULD at a time, we limit the number of simultaneously processed
+ULDs during period t by $open_{t}$. To calculate this number for a point in time,
+we sum up the ULDs of all flights that have been started during earlier periods and
+are not finished yet:
+
+\begin{align}
+\sum_{k \in {K}}\sum_{t' \in {T}} start_{kt'} \le open_{t} \qquad \forall t \in T
+\end{align} $t - dur_{k} \le t' \le t$
+
+$\newline$
 
 \subsubsection{Objective Function for Build Up Process}
 \label{sec:objBUZone}
 
-\subsection{Overall Model}
-\label{sec:overallModel}
+While satisfying all the given constraints, we want to load as much cargo as possible. o maximize the load, we minimize the amount of weight the departing flight lost and the number of ULDs building up unassociated to the departing flight.
 
-------------------------------------------------------------------------
-
-\pagebreak
-
-\begin{table}[h!]
-	\begin{center}
-		\caption{Drop Zone}
-		\label{tab:table1}
-		\begin{tabular}{l|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-			\textbf{Name} & \textbf{Workstations} & \textbf{Sequence}\\
-			\hline
-			& & \\
-			DZ NRML-1 & 6 & 1\\
-			DZ NRML-2 & 4 & 2\\
-			DZ NML-1 & 3 & 3\\
-			DZ CLD-1 & 5 & 4\\
-		\end{tabular}
-	\end{center}
-\end{table}
-
-\begin{table}[h!]
-	\begin{center}
-		\caption{Break Down Zone}
-		\label{tab:table1}
-		\begin{tabular}{l|c|c|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-			\textbf{Name} & \textbf{Workstations} & \textbf{Sequence} & \textbf{ToWH} & \textbf{HandTimePerULD}\\
-			\hline
-			& & & & \\
-			B BD NRML-1 & 33 & 1 & 0:30 & 0:24\\
-			B BD NRML-2 & 10 & 2 &  0:25 & 0:24\\
-			BD NML-1 & 4 & 3 &  0:40 & 0:13\\
-			BD CLD-1 & 8 & 4  &  0:30 & 0:17\\
-			BD NRML-1 & 5 & 5  &  0:30 & 0:20\\
-			BD NML-2 & 3 & 6  & 0:25 & 0:13\\
-			BD NRML-2 & 6 & 7  & 0:40 & 0:20\\
-			BD NRML-3 & 3 & 8  & 0:40 & 0:20\\
-			BD CLD-2 & 5 & 9  & 0:30 & 0:17\\
-			BD NML-3 & 5 & 10  & 0:25 & 0:20\\
-			BD NRML-4 & 3 & 11  & 0:30 & 0:13\\
-			BD CLD-4 & 1 & 12  & 0:40 & 0:15\\
-		\end{tabular}
-	\end{center}
-\end{table}
-
-\pagebreak
-
-\textbf{\underline{\large{Arrival}}}:
-
-Let each ULD ${\color{black}i\in{\color{black}I = \{1,2,3,\dots,n\}}}$
-
-${\color{black}a_{i}}$ - Arrival time of each ULD ${\color{black}i}$
-
-$\textcolor{black}{s_{i}}$ - Idle time spent by ULD i at drop zone
-
-$\textcolor{black}{p_{i}}$ - Priority of ULD i
+\begin{equation*}
+\min \qquad {} (\sum_{k \in K} \sum_{t \in T} dead_{kt} + \sum_{k \in K} offload_{k})
+\end{equation*}
 
 $\newline$
 
-\textbf{\underline{\large{Break Down (BD) Zones}}}: $\textcolor{black}{j\in J = \{1,2,3,\dots,m\}}$
+%\subsection{Overall Model}
+%\label{sec:overallModel}
 
-$\newline$
+%------------------------------------------------------------------------
 
-\textbf {From the drop zone the ULDs need to be transported to a breakdown zone (BD zone), which are located at different places of the airport, have different capacity and handling times within the zone.}
+%\begin{table}[h!]
+%	\begin{center}
+%		\caption{Drop Zone}
+%		\label{tab:table1}
+%		\begin{tabular}{l|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+%			\textbf{Name} & \textbf{Workstations} & \textbf{Sequence}\\
+%			\hline
+%			& & \\
+%			DZ NRML-1 & 6 & 1\\
+%			DZ NRML-2 & 4 & 2\\
+%			DZ NML-1 & 3 & 3\\
+%			DZ CLD-1 & 5 & 4\\
+%		\end{tabular}
+%	\end{center}
+%\end{table}
 
-\noindent\includegraphics[width=12cm]{BDzone.png}\qquad
-
-$\textcolor{black}{x_{ij}\in\{0,1\},\forall {i \in I, j \in J}}$ - denotes if ULD $i$ is
-assigned to BD zone $j$ or not.
-
-
-$\textcolor{black}{t_{j}}$ - Time taken to transport an ULD to BD
-zone \textcolor{black}{$j$}
-
-$\textcolor{black}{C_{j}}$ - Capacity of each BD Zone \textcolor{black}{$j$}
-
-$\textcolor{black}{H_{j}}$ - Handling time of a ULD from in BD zone \textcolor{black}{$j$}
-
-$\textcolor{black}{a_{i}+s_{i}+{\displaystyle \sum_{i,j\in E}x_{i,j}T_{j}}}$ - gives the
-Arrival time of ULD \textcolor{black}{$i$} to its BD zone \textcolor{black}{$j$}
-
-$\textcolor{black}{\displaystyle \sum_{i,j\in E}x_{i,j}}$ $\leq{C_{j}}$ , $\forall{j \in J}$ - Capacity constraint needs to be checked from time to time
-
-\pagebreak
-
-\textbf{\underline{\large{Warehouse}}}:
-
-\textbf {When the shipments are unpacked, they are sent to the storage warehouse (WH) which is fully automated and with the assumption, that there are never capacity issues in the storage WH. In a next step the shipments are built up again to ULDs depending on their connecting flight. A departing aircraft type has a link to a specific BU zone, so with the provided information which aircraft the shipment should go on, the BU zone is known.
-}
-
-$\newline$
-
-$\textcolor{black}{T_{j}^{\prime}}$ - Time taken to transport shipment from BD zone \textcolor{black}{$j$} to Warehouse
-
-$\textcolor{black}{W_{k}}$ - Time at which, all shipments for a new Flight k are requested
-
-$\textcolor{black}{T_{k}^{\prime}}$ - Transport time from Warehouse to BU Zone for all shipments of Flight \textcolor{black}{$k$}
-
-$\newline$
-
-\textbf{\underline{\large{Build Up (BU) Zone}}}:
-
-$\newline$
-
-$\textcolor{black}{B_{k}}$ - Time taken to Build up ALL new ULDs for flight \textcolor{black}{$k$}
-
-$\textcolor{black}{d_{k}}$ - Departure time of a flight \textcolor{black}{$k$} must be ready (given)
-
-$\textcolor{black}{T_{k}}$ -Transport time from BU to Flight \textcolor{black}{$k$} (given)
-
-$\textcolor{black}{p_{k}^{\prime}}$ - Default processing time of flight \textcolor{black}{$k$} (given)
-
-$\textcolor{black}{p_{k}^{\prime\prime}}$ - Pre processing time of flight \textcolor{black}{$k$} (given)
-
-$\textcolor{black}{W_{k}}$ + $\textcolor{black}{T_{k}}$ +${T_{k}^{\prime}}$+ $\textcolor{black}{B_{k}}$ + $\textcolor{black}{p_{k}^{\prime}}$ + $\textcolor{black}{p_{k}^{\prime\prime}}$ $\leq$ $\textcolor{black}{d_{k}}$ //Constraint respecting Flight time
-
-$\newline$
-
-\noindent\includegraphics[width=12cm]{BUzone.png}\qquad
-
-\pagebreak
-
-Let $\textcolor{black}{Y_{i,k}^{l}}$ $\in\{0,1\}$ - depending on whether shipment l going to flight k is in ULD i or not.
-
-$\textcolor{black}{w_{l}}$ - Weight of each shipment \textcolor{black}{$l$} (given)
-
-$\textcolor{black}{Q_{k}}$ - Total weight of shipments going via flight \textcolor{black}{$k$} (summation of $\textcolor{black}{w_{l}}$)(given)
-
-$\textcolor{black}{\displaystyle \sum_{i\in I} \sum_{l\in L}Y_{i,k}^{l}}$$\textcolor{black}{w_{l}}$ = $\textcolor{black}{Q_{k}}$ , $\forall{k}$ - Respecting assigned shipment weight to Flights \textcolor{black}{$k$}
-
-$\textcolor{black}{\displaystyle \sum_{i\in I} \sum_{l\in L} \sum_{k\in K}Y_{i,k}^{l}}$ - N // Total no of shipments
-
-All shipments of flight k, should reach be available before time $\textcolor{black}{W_{k}}$:
-
-$\textcolor{black}{a_{i}+s_{i}+{\displaystyle \sum_{i,j\in E}x_{i,j}T_{j}}}+{T_{j}^{\prime}}+{H_{j}}$ $\leq$ ${W_{k}}$ + (1-${Y_{i,k}^{l}}$)M, $\forall{i,k,l}$ // Time constraint for every shipment.
-
-$\newline$
-
-\textbf{\large{Objective Function}}: Minimizing the maximum slack
-$\newline$
-
-$\textcolor{black}{Min(Max(  s_{i}}+{W_{k}}$))
+%\begin{table}[h!]
+%	\begin{center}
+%		\caption{Break Down Zone}
+%		\label{tab:table1}
+%		\begin{tabular}{l|c|c|c|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+%			\textbf{Name} & \textbf{Workstations} & \textbf{Sequence} & \textbf{ToWH} & \textbf{HandTimePerULD}\\
+%			\hline
+%			& & & & \\
+%			B BD NRML-1 & 33 & 1 & 0:30 & 0:24\\
+%			B BD NRML-2 & 10 & 2 &  0:25 & 0:24\\
+%			BD NML-1 & 4 & 3 &  0:40 & 0:13\\
+%			BD CLD-1 & 8 & 4  &  0:30 & 0:17\\
+%			BD NRML-1 & 5 & 5  &  0:30 & 0:20\\
+%			BD NML-2 & 3 & 6  & 0:25 & 0:13\\
+%			BD NRML-2 & 6 & 7  & 0:40 & 0:20\\
+%			BD NRML-3 & 3 & 8  & 0:40 & 0:20\\
+%			BD CLD-2 & 5 & 9  & 0:30 & 0:17\\
+%			BD NML-3 & 5 & 10  & 0:25 & 0:20\\
+%			BD NRML-4 & 3 & 11  & 0:30 & 0:13\\
+%			BD CLD-4 & 1 & 12  & 0:40 & 0:15\\
+%		\end{tabular}
+%	\end{center}
+%\end{table}
 
 \end{document}
