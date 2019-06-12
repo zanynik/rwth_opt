@@ -257,7 +257,7 @@ $\newline$
 \subsection{Break Down Process}
 \label{sec:ParamBDZone}
 
-In BD zones, our model has arrival time parameters for each ULD. Similar to this, each BD zone has its own capacity, handling time and transportation time from drop zone. Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J.
+In BD zones, our model has arrival time parameters for each ULD. Similar to this, each BD zone has its own capacity, handling time and transportation time from drop zone. Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J. Time is discretized into minutes in set T.
 
 \begin{equation*} ${\color{black} ULD i}$ {}  \in {}  ${\color{black}I}$ {} = {} ${\color{black}\{1,2,3,...,N\}}$  \end{equation*} 
 \begin{equation*} ${\color{black} BD zone j}$ {}  \in {}  ${\color{black}J}$ {} = {} ${\color{black}\{1,2,3,...,M\}}$ \end{equation*} 
@@ -274,7 +274,7 @@ ${\color{black}c_{j}}$ : Capacity of BD zone ${\color{black}j}$
 
 $\textcolor{black}{h_{j}}$ : Handling time in BD zone ${\color{black}j}$
 
-$\textcolor{black}{t_{j}}$ : Time taken to transport an ULD to BD zone ${\color{black}j}$
+$\textcolor{black}{T_{j}}$ : Time taken to transport an ULD to BD zone ${\color{black}j}$
 
 $\newline$
 
@@ -285,14 +285,14 @@ In the Break Down zone, the decision needs to be taken which ULDs should be assi
 
 $\newline$
 
-$\textcolor{black}{x_{ij}^{t}\in\{0,1\}, \forall {i \in I, j \in J}}$ : if a ULD i is assigned to BD zone j or not at time t
+$\textcolor{black}{x_{ij}^{t}\in\{0,1\}, \forall {i \in I, j \in J, t \in T}}$ : if a ULD i is assigned to BD zone j at time t or not.
 
 $\newline$
 
 \subsubsection{Constraints for Break Down Process}
 \label{sec:constraintsBDZone}
 
-For BD processes we have several constraints. The first one (1) is the capacity constraint and the second one (2) is the assignment constraint which means all ULDs have to be assigned to exactly one BD zone. 
+For BD processes we have several constraints. The first one (1) is the assignment constraint which means all ULDs have to be assigned to exactly one BD zone  and the second one (2) is the capacity constraint. 
 
 
 %\begin{align}
@@ -304,16 +304,14 @@ For BD processes we have several constraints. The first one (1) is the capacity 
 
 $\newline$
 
-The third constraint (3) mentions that each ULD has to be processed. 
-
 \begin{align}
 \sum_{j \in J}\sum_{t=1}^{T-h_{j}+1} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
 
 $\newline$
 
-As a last constraint (4), we can say that if ULD i is started to be processed at time t, no other job can start before $t + h_{j}$. Because the process of the current ULD needs to be completed. If ULD i starts at t in BD zone j, other ULDs are in the set of $u \in I 	\setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the ULDs which are processed and completed. For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
-
+In the second constraint (2), we say that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
+If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I 	\setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
 
 \begin{align}
 c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau = t}^{t+h_{j}-1} x_{ij}^{\tau} \qquad \forall t \in T, \forall j \in J
@@ -321,19 +319,17 @@ c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau =
 
 $\newline$
 
-The effect is no two ULDs run in parallel. For the objective funciton we need to know the ULD starting times. Here, starting time of ULD i is $t_{i} = \sum_{t=0}^{T-h_{j}+1} t' x_{ij}^t $.
+The effect is no more ULDs than the capacity of BD zone are assigned at any time.
+We get starting time of ULD i as $t_{i,start} = \sum_{t=0}^{T-h_{j}+1} t x_{ij}^t $.
 
 
 %\subsubsection{Objective Function for Break Down Process}
 %\label{sec:objBDZone}
 
-During the whole BD zone process, the goal is to minimize the BD zone end time for ULDs. If a ULD is assigned for the BD zone, the total time has to be calculated for that. This means total process time of one ULD i from drop zone to the end of the BD zone. For calculating this, waiting time in drop zone which is the idle time parameter, handling time and transportation time from the drop zone have to be considered if that ULD is assigned. Then we need to consider all ULDs.
+%During the whole BD zone process, the goal is to minimize the BD zone end time for ULDs. If a ULD is assigned for the BD zone, the total time has to be calculated for that. This means total process time of one ULD i from drop zone to the end of the BD zone. For calculating this, waiting time in drop zone which is the idle time parameter, handling time and transportation time from the drop zone have to be considered if that ULD is assigned. Then we need to consider all ULDs.
 
 $\newline$
-Basically, this is the total process time for one ULD:
-$\newline$
-
- ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}^{t}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}^{t}}}$
+ULD i is broken down at time $t_{i,end} =   \sum_{t=0}^{T-h_{j}+1}{\color{black}{t}}$ ${\color{black}{x_{ij}^{t}}}$ + $\sum_{j \in J}\sum_{t=0}^{T-h_{j}+1}{\color{black}{h_{j}}}$$ {\color{black}{x_{ij}^{t}}}$
 
 %\begin{equation*}
 %	\min \qquad \sum_{t \in T} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij}^{t} + h_{j}x_{ij}^{t})
