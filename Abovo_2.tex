@@ -122,8 +122,17 @@ $\newline$
 An international airline hub needs to plan the air cargo movement so that all shipments catch their connecting flights or road connections. Air cargo shipments are transported in so-called unit load devices (ULDs). A ULD contains many shipments which need to go different final destinations. Hence, at the first step of the whole process, the incoming ULDs are broken down at the arrival. Here in the breakdown zone (BD), ULDs have to be unpacked and seperated. The seperate shipments are transported in the warehouse to wait for the build up call. These shipments are then moved to packing area which is called buildup zone (BU). At the end, outbound ULDs are constructed with these shipments and they are taken to the outbound flight for loading. All zones have different attributes such as number of workstations, capacities, transportation times between zones and the warehouse. Shipments also have different attributes such as priority and weight. Regarding all the attributes, constraints and the parameters which are stated in detail in problem description, the goal of the optimization process is to build up all ULDs as soon as possible to make them catching their connections.
 $\newline$
 
+
+%\noindent\includegraphics[width=18cm]{1_process.png}\qquad
 $\newline$
-\noindent\includegraphics[width=18cm]{1_process.png}\qquad
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=170mm,scale=1.5]{1_process.png}
+	\caption{The Process That Takes Place at a Hub}
+	\label{fig:The Process That Takes Place at a Hub}
+\end{figure}
+
 $\newline$
 
 \newpage
@@ -135,7 +144,14 @@ $\newline$
 The process of one shipment begins in drop zone when it comes to the airport in an inbound ULD. ULDs are unloaded from an aircraft by the ground handling agent and placed in a drop zone (not part of our planning puzzle). There are 4 drop zones and each drop zone has different number of workstations. Each ULD has a scheduled arrival and at a later stage an actual arrival time. From drop zone, each ULD has to be taken to the breakdown zone to get unpacked. Our problem also starts here. There are different distances between each drop zone and each breakdown zone. The sample distances between some of the drop zones and some of the BD zones are given below in the table:
 
 $\newline$
-\noindent\includegraphics[width=12cm]{distances_drop_bdzone.png}\qquad
+%\noindent\includegraphics[width=12cm]{distances_drop_bdzone.png}\qquad
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=100mm,scale=1.5]{distances_drop_bdzone.png}
+	\caption{Sample Distances Between Drop Zone and Break Down Zone}
+	\label{fig:Sample Distances Between Drop Zone and Break Down Zone}
+\end{figure}
 
 $\newline$
 In BD zone, ULDs are seperated into shipments. There are 12 different BD zones in the hub. So they are located at different places of the airport. Thus all BD zones have different attributes. Attributes related to BD zones are below: 
@@ -147,7 +163,14 @@ In BD zone, ULDs are seperated into shipments. There are 12 different BD zones i
 	\item Different handling times per ULD.
 \end{itemize}
 
-\noindent\includegraphics[width=15cm]{BDZones.png}\qquad
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{BDZones.png}
+	\caption{Break Down Zone Attributes}
+	\label{fig:Break Down Zone Attributes}
+\end{figure}
+
+%\noindent\includegraphics[width=30cm]{BDZones.png}\qquad
 
 $\newline$
 Within the BD zone, the decision needs to be taken in which order the ULDs should be unpacked. ULDs need to be broken down early enough, so all shipments can make their connections or promised pickup time. There are 3 different shipments within the hub. Cooling products, normal products (NRML) and animals (NML). Also each shipment has different priorities in these BD zones. Because some of the shipments may be animals or cooled products which are mentioned above and need to be processed before the regular shipments. ULDs contain a shipment with a high priority, need to be unpacked earlier than the others. Each shipment within the ULD is either in transit and needs to catch the connecting flight or will be further transported on the road usually by truck (not part of our planning puzzle) or is picked up from the warehouse by a customer. When the shipments are in transit and unpacked, depending on the scheduled departure time of the connection flight on which cargo is booked, it is either stored temporarily in the warehouse or directly sent to build up process. The warehouse (WH) is fully automated and with the assumption, that there are never capacity constraints in the WH. As soon as enough stock is available in the storage WH to build up one ULD for a specific aircraft, these can be requested to be provided to the BU zone.
@@ -161,6 +184,8 @@ In a next step the shipments are built up again to ULDs depending on their conne
 	\begin{figure}[hbt!]
 		\centering
 		\includegraphics[width=100mm,scale=1.5]{buzone_data1.png}
+		\caption{Handling Times and Transportation Times from Warehouse to BU Zones}
+		\label{fig:Handling Times and Transportation Times from Warehouse to BU Zones}
 	\end{figure}
 
 \end{itemize}
@@ -174,6 +199,8 @@ In a next step the shipments are built up again to ULDs depending on their conne
 	\begin{figure}[hbt!]
 		\centering
 		\includegraphics[width=40mm,scale=1.0]{sample_ws_bu.png}
+		\caption{Workstations in BU Zones}
+		\label{fig:Workstations in BU Zones}
 	\end{figure}
 	%%\noindent\includegraphics[width=8cm]{sample_ws_bu.png}\qquad
 
@@ -188,6 +215,8 @@ In a next step the shipments are built up again to ULDs depending on their conne
 	\begin{figure}[hbt!]
 		\centering
 		\includegraphics[width=90mm,scale=1.5]{sample_bu_flight.png}
+		\caption{Sample Flights Related to BU Zones and Transpotation Times}
+		\label{fig:Sample Flights Related to BU Zones and Transpotation Times}
 	\end{figure}
 	%%\noindent\includegraphics[width=10cm]{sample_bu_flight.png}\qquad
 
@@ -200,6 +229,8 @@ In a next step the shipments are built up again to ULDs depending on their conne
 	\begin{figure}[hbt!]
 		\centering
 		\includegraphics[width=90mm,scale=1.5]{preprocess_time.png}
+		\caption{Pre-Processing Times of the Flights}
+		\label{fig:Pre-Processing Times of the Flights}
 	\end{figure}
 	%%\noindent\includegraphics[width=10cm]{preprocess_time.png}\qquad
 	
@@ -208,6 +239,7 @@ In a next step the shipments are built up again to ULDs depending on their conne
 The goal is to build up all ULDs as soon as possible to make the connections, while the work should be processed in batches, to avoid unnecessary transportation within the BU zone.
 
 \newpage
+
 
 \section{Mathematical Model for the Problem}
 \label{sec:mathmodel}
@@ -225,7 +257,7 @@ $\newline$
 \subsection{Break Down Process}
 \label{sec:ParamBDZone}
 
-In BD zones, our model has arrival time, priority and idle time parameters for each ULD. Similar to this, each BD zone has its own capacity, handling time and transportation time from drop zone. Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J.
+In BD zones, our model has arrival time parameters for each ULD. Similar to this, each BD zone has its own capacity, handling time and transportation time from drop zone. Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J.
 
 \begin{equation*} ${\color{black} ULD i}$ {}  \in {}  ${\color{black}I}$ {} = {} ${\color{black}\{1,2,3,...,N\}}$  \end{equation*} 
 \begin{equation*} ${\color{black} BD zone j}$ {}  \in {}  ${\color{black}J}$ {} = {} ${\color{black}\{1,2,3,...,M\}}$ \end{equation*} 
@@ -234,9 +266,9 @@ In BD zones, our model has arrival time, priority and idle time parameters for e
 
 ${\color{black}a_{i}}$ : Arrival time of ULD ${\color{black}i}$ in drop zone 
 
-$\textcolor{black}{s_{i}}$ : Idle time spent by ULD ${\color{black}i}$ in drop zone
+%$\textcolor{black}{s_{i}}$ : Idle time spent by ULD ${\color{black}i}$ in drop zone
 
-$\textcolor{black}{p_{i}}$ : Priority of ULD ${\color{black}i}$
+%$\textcolor{black}{p_{i}}$ : Priority of ULD ${\color{black}i}$
 
 ${\color{black}c_{j}}$ : Capacity of BD zone ${\color{black}j}$
 
@@ -263,12 +295,12 @@ $\newline$
 For BD processes we have several constraints. The first one (1) is the capacity constraint and the second one (2) is the assignment constraint which means all ULDs have to be assigned to exactly one BD zone. 
 
 
-\begin{align}
-\sum_{i \in {I}} x_{ij}^{t} \le c_{j} \qquad \forall j \in J, \forall t \in T 
-\end{align}
-\begin{align}
-\sum_{j \in {J}} x_{ij}^{t} = 1 \qquad \forall i \in I, \forall t \in T
-\end{align}
+%\begin{align}
+%\sum_{i \in {I}} x_{ij}^{t} \le c_{j} \qquad \forall j \in J, \forall t \in T 
+%\end{align}
+%\begin{align}
+%\sum_{j \in {J}} x_{ij}^{t} = 1 \qquad \forall i \in I, \forall t \in T
+%\end{align}
 
 $\newline$
 
@@ -289,35 +321,27 @@ c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau =
 
 $\newline$
 
-The effect is no two ULDs run in parallel. For the objective funciton we need to know the ULD starting times. Here, starting time of ULD i is $t_{i} = \sum_{t=0}^{T-h_{j}+1} t x_{it} $.
+The effect is no two ULDs run in parallel. For the objective funciton we need to know the ULD starting times. Here, starting time of ULD i is $t_{i} = \sum_{t=0}^{T-h_{j}+1} t' x_{ij}^t $.
 
-$\newline$
 
-\subsubsection{Objective Function for Break Down Process}
-\label{sec:objBDZone}
+%\subsubsection{Objective Function for Break Down Process}
+%\label{sec:objBDZone}
 
 During the whole BD zone process, the goal is to minimize the BD zone end time for ULDs. If a ULD is assigned for the BD zone, the total time has to be calculated for that. This means total process time of one ULD i from drop zone to the end of the BD zone. For calculating this, waiting time in drop zone which is the idle time parameter, handling time and transportation time from the drop zone have to be considered if that ULD is assigned. Then we need to consider all ULDs.
 
 $\newline$
-
 Basically, this is the total process time for one ULD:
 $\newline$
 
- ${\color{black}{s_{i}}}$ + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}^{t}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}^{t}}}$
+ ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}^{t}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}^{t}}}$
 
-$\newline$
-We are trying to minimize this statement above for all ULDs. Then this is the objective function for BD zone: 
-$\newline$
-
-\begin{equation*}
-	\min \qquad \sum_{t \in T} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij}^{t} + h_{j}x_{ij}^{t})
-\end{equation*} 
+%\begin{equation*}
+%	\min \qquad \sum_{t \in T} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij}^{t} + h_{j}x_{ij}^{t})
+%\end{equation*} 
 
 %$\textcolor{black}{s_{i}}$  + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}}}$
 
-
 $\newline$
-
 At this phase, priorities are not considered in our model in BD zones.
 
 $\newline$
