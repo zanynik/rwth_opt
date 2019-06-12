@@ -274,7 +274,9 @@ ${\color{black}c_{j}}$ : Capacity of BD zone ${\color{black}j}$
 
 $\textcolor{black}{h_{j}}$ : Handling time in BD zone ${\color{black}j}$
 
-$\textcolor{black}{T_{j}}$ : Time taken to transport an ULD to BD zone ${\color{black}j}$
+$\textcolor{black}{T_{ij}}$ : Time taken to transport an ULD ${\color{black}i}$ to BD zone ${\color{black}j}$
+
+$\textcolor{black}{T_{j}}$ : Time taken to transport shipments from ${\color{black}i}$ to BD zone ${\color{black}j}$ to Warehouse
 
 $\newline$
 
@@ -309,9 +311,8 @@ $\newline$
 \end{align}
 
 $\newline$
-
 In the second constraint (2), we say that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
-If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I 	\setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
+If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I \setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
 
 \begin{align}
 c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau = t}^{t+h_{j}-1} x_{ij}^{\tau} \qquad \forall t \in T, \forall j \in J
@@ -320,22 +321,15 @@ c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau =
 $\newline$
 
 The effect is no more ULDs than the capacity of BD zone are assigned at any time.
-We get starting time of ULD i as $t_{i,start} = \sum_{t=0}^{T-h_{j}+1} t x_{ij}^t $.
-
-
-%\subsubsection{Objective Function for Break Down Process}
-%\label{sec:objBDZone}
-
-%During the whole BD zone process, the goal is to minimize the BD zone end time for ULDs. If a ULD is assigned for the BD zone, the total time has to be calculated for that. This means total process time of one ULD i from drop zone to the end of the BD zone. For calculating this, waiting time in drop zone which is the idle time parameter, handling time and transportation time from the drop zone have to be considered if that ULD is assigned. Then we need to consider all ULDs.
+We get starting time of ULD i : 
+$\newline$
+$t_{i,start} = \sum_{t=0}^{T-h_{j}+1} t . x_{ij}^t $
 
 $\newline$
-ULD i is broken down at time $t_{i,end} =   \sum_{t=0}^{T-h_{j}+1}{\color{black}{t}}$ ${\color{black}{x_{ij}^{t}}}$ + $\sum_{j \in J}\sum_{t=0}^{T-h_{j}+1}{\color{black}{h_{j}}}$$ {\color{black}{x_{ij}^{t}}}$
+ULD i is broken down at time :
 
-%\begin{equation*}
-%	\min \qquad \sum_{t \in T} \sum_{j \in J} \sum_{i \in I} (s_{i} + t_{j}x_{ij}^{t} + h_{j}x_{ij}^{t})
-%\end{equation*} 
-
-%$\textcolor{black}{s_{i}}$  + ${\color{black}{t_{j}}}$ ${\color{black}{x_{ij}}}$ + ${\color{black}{h_{j}}}$ ${\color{black}{x_{ij}}}$
+$\newline$
+ $t_{i,end} =   \sum_{t=0}^{T-h_{j}+1}{\color{black}{(t + \sum_{j \in J}h_{j})}}$
 
 $\newline$
 At this phase, priorities are not considered in our model in BD zones.
@@ -477,7 +471,7 @@ are not finished yet:
 
 $\newline$
 
-\subsubsection{Objective Function for Build Up Process}
+\subsubsection{Objective Function}
 \label{sec:objBUZone}
 
 While satisfying all the given constraints, we want to load as much cargo as possible. o maximize the load, we minimize the amount of weight the departing flight lost and the number of ULDs building up unassociated to the departing flight.
