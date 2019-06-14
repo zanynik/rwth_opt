@@ -309,19 +309,19 @@ $\textcolor{black}{y_{lij}^{t}\in\{0,1\}, \forall {i \in I, j \in J, j \in L_k, 
 For BD zone processes we have three constraints. The first one (1) is the constraint that ensures that the ULD is assigned at a feasible time, the second one (2) is an assignment constraint which means all ULDs have to be assigned to exactly one BD zone and the third one (2) is the capacity constraint. 
 
 $\newline$
-The time at which Break down of  ULD i starts, $t_{i,start} = \sum_{j \in J}\sum_{t=1}^{d_{i}} t . x_{ij}^t $
+The time at which Break down of  ULD i starts, $t_{i,start} = \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t . x_{ij}^t $
 $\newline$
 $\newline$
 Each ULD takes i  $T_{ij}$ time to travel to its assigned BD zone j, therefore the following constraint ensures that the start time of ULD i is greater than the sum of its arrival time and transportation time :
 $\newline$
 \begin{align}
-\sum_{j \in J}\sum_{t=1}^{d_{i}} t . x_{ij}^t \ge a_{i} + T_{ij},  \qquad i \in I
+\sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t . x_{ij}^t \ge a_{i} + T_{ij},  \qquad i \in I
 \end{align}
 
 Each ULD i must be assigned to a BD zone j before the earliest departure time of the shipment it contains. We will further tighten this time limit in other constraints that follow. The following constraint ensures that each ULD is assigned : 
 
 \begin{align}
-\sum_{j \in J}\sum_{t=1}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
+\sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
 
 $\newline$
@@ -329,7 +329,7 @@ In the third constraint (3), we say that if ULD's in subset i are started to be 
 If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I \setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
 
 \begin{align}
-c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau = t}^{t+h_{j}-1} x_{ij}^{\tau} \qquad \forall t \in T, \forall j \in J
+c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau = t+1}^{t+h_{j}-1} x_{ij}^{\tau} \qquad \forall t \in T, \forall j \in J
 \end{align}
 
 $\newline$
@@ -337,7 +337,7 @@ The effect is no more ULDs than the capacity of BD zone are assigned at any time
 $\newline$
 $\newline$
 
-ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=1}^{d_{i}}{\color{black}{(t + h_{j})}} . x_{ij}^t$
+ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}}{\color{black}{(t + h_{j})}} . x_{ij}^t$
 
 $\newline$
 Lets consider the journey of each shipment. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then it also means that all shipments in ULD i are assigned at that time t to BD zone j.
@@ -396,7 +396,7 @@ $\newline$
 All shipments must be assigned to a workstation in its designated Build up zone.
 $\newline$
 \begin{align}
-\sum_{m \in M}\sum_{t=1}^{d_l} z_{lkm}^{t} = 1  \qquad \forall l \in L_k, \forall k \in K 
+\sum_{m \in M}\sum_{t=a_{l}}^{d_l} z_{lkm}^{t} = 1  \qquad \forall l \in L_k, \forall k \in K 
 \end{align}
 
 $\newline$
@@ -404,7 +404,7 @@ If shipments in subset  $\textcolor{black}{l\in\ L_k }$ start at $\textcolor{bla
 $\newline$
 
 \begin{align}
-Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lkm}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{T=t}^{t+b_k-1} Z_{pkm}^{t}.w_l , \qquad \forall m \in M, \forall k \in K 
+Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lkm}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pkm}^{\tau}.w_l , \qquad \forall m \in M, \forall k \in K 
 \end{align}
 
 
@@ -414,7 +414,7 @@ The number of workstation in the Build up zone that are to be assigned to build 
 $\newline$
 
 \begin{align}
-\sum_{m \in M}\sum_{t=a_l}^{d_k}{Q_{mk}^{t}} \le \dfrac{\sum_{l \in L_k}\sum_{m \in M}\sum_{t=a_l}^{d_k}{Z_{lkm}^{t} w_{l}}}{W} + 1 ,  \qquad \forall k \in K
+\sum_{m \in M}\sum_{t=a_l}^{d_k}{Q_{mk}^{t}} \le \dfrac{\sum_{l \in L_k}\sum_{m \in M}\sum_{t=a_l}^{d_k}{z_{lkm}^{t} w_{l}}}{W} + 1 ,  \qquad \forall k \in K
 \end{align}
 
 $\newline$
@@ -422,7 +422,7 @@ If a workstation 'm' in a buildup zone is assigned to flight k at time t, then n
 
 $\newline$
 \begin{align}
-1 - {Q_{mk}^{t}} \ge \sum_{\tau = t}^{t + b_{k} + 1}{Q_{mq}^{t}} ,  \qquad \forall q \in K \setminus \{k\} , \forall m \in M, \forall t \in T
+1 - {Q_{mk}^{t}} \ge \sum_{\tau = t}^{t + b_{k}}{Q_{mq}^{t}} ,  \qquad \forall q \in K \setminus \{k\} , \forall m \in M, \forall t \in T
 \end{align}
 
 \subsubsection{Precedence constraints}
@@ -439,7 +439,7 @@ In the entire timeline of a shipment from its arrival to departure we have a pre
 
 The end time of ULD i in Break down process and the summation of transportation time needed to reach Warehouse shall be less that the time at which the shipment l is assigned to a workstation 'm' in Build up zone of flight k.
 \begin{align}
- \sum_{j \in J}\sum_{t=1}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . y_{lij}^t  \le \sum_{m \in M_{k}}\sum_{t=1}^{d_{l}}z_{lkm}^t . t \qquad \forall i \in I , \forall  \forall l \in L_{i}, \forall k \in K, \forall t \in T
+ \sum_{j \in J}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . y_{lij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lkm}^t . t \qquad \forall i \in I , \forall  \forall l \in L_{i}, \forall k \in K, \forall t \in T
 \end{align}
 
 \subsection{Objective Function}
