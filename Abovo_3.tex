@@ -324,6 +324,16 @@ Each ULD i must be assigned to a BD zone j before the earliest departure time of
 \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
 
+For multiple dropzone ULD's
+\begin{align}
+\sum_{j \in J_{NML}}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
+\end{align}
+
+\begin{align}
+\sum_{j \in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
+\end{align}
+
+
 $\newline$
 In the third constraint (3), we say that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
 If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I \setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
@@ -341,11 +351,13 @@ ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}
 
 $\newline$
 Lets consider the journey of each shipment. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then it also means that all shipments in ULD i are assigned at that time t to BD zone j.
-Hence we capture this information for each shipment in a new variable $y_{lij}^t$
-$\newline$
+
+$J_{NML} \bigcup J_{NRML} = J$
+
 \begin{align}
-y_{lij}^t = x_{ij}^t \qquad , \forall i \in I, \forall l \in L_{i}, \forall j \in J , \forall t \in T 
+\sum_{j\in J_{NML}}\sum_{t=a_{i}}^{d_{i}} (t + h_{j}) . x_{ij}^t  \le \sum_{j\in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} (t) . x_{ij}^t
 \end{align}
+
 
 \begin{figure}[hbt!]
 	\centering
@@ -380,7 +392,7 @@ $\newline$
 Shipment  \textcolor{black}{$l$} having departure flight  \textcolor{black}{$k$} is assigned to one of  \textcolor{black}{$"m"$} workstations in its BU Zone.
 $\newline$
 
-$\textcolor{black}{z_{lkm}^{t}\in\{0,1\}, \forall {i \in I, l \in L_i, m \in M_k, t \in T}}$
+$\textcolor{black}{z_{lm_{k}}^{t}\in\{0,1\}, \forall {i \in I, l \in L_i, m \in M_k, t \in T}}$
 $\newline$
 
 
@@ -396,7 +408,7 @@ $\newline$
 All shipments must be assigned to a workstation in its designated Build up zone.
 $\newline$
 \begin{align}
-\sum_{m \in M}\sum_{t=a_{l}}^{d_l} z_{lkm}^{t} = 1  \qquad \forall l \in L_k, \forall k \in K 
+\sum_{m \in M}\sum_{t=a_{l}}^{d_l} z_{lm_{k}}^{t} = 1  \qquad \forall k \in K, \forall l \in L_k  
 \end{align}
 
 $\newline$
@@ -404,7 +416,7 @@ If shipments in subset  $\textcolor{black}{l\in\ L_k }$ start at $\textcolor{bla
 $\newline$
 
 \begin{align}
-Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lkm}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pkm}^{\tau}.w_l , \qquad \forall m \in M, \forall k \in K 
+Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm_{k}}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pm_{k}}^{\tau}.w_l , \qquad \forall k \in K, \forall m \in M_k, \forall t \in T  
 \end{align}
 
 
@@ -414,7 +426,7 @@ The number of workstation in the Build up zone that are to be assigned to build 
 $\newline$
 
 \begin{align}
-\sum_{m \in M}\sum_{t=a_l}^{d_k}{Q_{mk}^{t}} \le \dfrac{\sum_{l \in L_k}\sum_{m \in M}\sum_{t=a_l}^{d_k}{z_{lkm}^{t} w_{l}}}{W} + 1 ,  \qquad \forall k \in K
+\sum_{m \in M_k}\sum_{t=a_l}^{d_k}{Q_{mk}^{t}} \le \dfrac{\sum_{l \in L_k}\sum_{m \in M}\sum_{t=a_l}^{d_k}{z_{lm_{k}}^{t} w_{l}}}{W} + 1 ,  \qquad \forall k \in K
 \end{align}
 
 $\newline$
@@ -422,7 +434,7 @@ If a workstation 'm' in a buildup zone is assigned to flight k at time t, then n
 
 $\newline$
 \begin{align}
-1 - {Q_{mk}^{t}} \ge \sum_{\tau = t}^{t + b_{k}}{Q_{mq}^{t}} ,  \qquad \forall q \in K \setminus \{k\} , \forall m \in M, \forall t \in T
+1 - {Q_{mk}^{t}} \ge \sum_{q \in K \setminus \{k\}}  \sum_{\tau = t}^{t + b_{k}}{Q_{mq}^{t}} ,  \qquad \forall k \in K , \forall m \in M_{k}, \forall t \in T
 \end{align}
 
 \subsubsection{Precedence constraints}
@@ -439,8 +451,15 @@ In the entire timeline of a shipment from its arrival to departure we have a pre
 
 The end time of ULD i in Break down process and the summation of transportation time needed to reach Warehouse shall be less that the time at which the shipment l is assigned to a workstation 'm' in Build up zone of flight k.
 \begin{align}
- \sum_{j \in J}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . y_{lij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lkm}^t . t \qquad \forall i \in I , \forall  \forall l \in L_{i}, \forall k \in K, \forall t \in T
+ \sum_{j \in J}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t . t \qquad \forall i \in I , \forall l \in L_{i}
 \end{align}
+
+For Multiple DZ ULDs we have to consider only NRML BD zone assignments for writing precedence constraint : 
+
+\begin{align}
+ \sum_{j \in J_{NRML}}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t . t \qquad \forall i \in I , \forall l \in L_{i}
+\end{align}
+
 
 \subsection{Objective Function}
 \label{sec:objBUZone}
@@ -448,7 +467,7 @@ The end time of ULD i in Break down process and the summation of transportation 
 Slack for each shipment is given by difference in departure time and the time at which shipments are built up into ULDs. Let this slack time for each shipment be greater than ${s_{min}}$
 
 \begin{align}
- ( d_{l} + p_{k}) - (z_{lkm}^t .(t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
+ ( d_{l} + p_{k}) - (z_{lm_{k}}^t .(t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
 \end{align}
 
 \begin{align}
