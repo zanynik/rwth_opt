@@ -91,7 +91,7 @@
 \begin{document}
 
 \onehalfspacing
-\title{Optimizing Air Cargo Handling at an International Airline Hub for AbOvo \\ MSc Data Analytics and Decision Science RWTH Aachen University} 
+\title{Optimizing Air Cargo Handling at an International Airline Hub for AbOvo \\} 
 \author{Ilkim Canoler \\ Luckshan Sivakumar \\  Nikhil Kulkarni \\ Karthikeyan Ramasubbu \\ Shekhar Dure}
 $\newline$
 $\newline$
@@ -102,7 +102,7 @@ $\newline$
 
 $\newline$
 \begin{abstract}
-	In this study, an operational planning problem in the air cargo industry is being tried to be solved. For all shipments in an international airline hub that need to catch their related flight on time, a mathematical model was constructed.  Working with our industrial partner AbOvo, we formalize the problem constraints and our objective. Besides, the necessary data is collected from AbOvo and we started working on it simultaneously. We are trying to establish a comprehensive view of tasks in an air cargo terminal and develop a suitable solution apporoach. Furthermore, our goal is to solve this model by using Gurobi solver as a full planning puzzle. In this paper, all explanations and details about our mathematical model and the data we have, can be found.
+	In this study, we solve an operational planning problem in the air cargo industry. In an international airline hub, all shipments which are arrived at airport, go through several processes such as breaking down and building up. At the end, all have to catch their connection flight on time. Due to the complexity of the overall puzzle, current practices at airlines are to split up the puzzle into two smaller and thus simpler puzzles. The goal of this case is to solve the full planning problem simultaneously or when solving separately considering the dependencies between the two parts. Working with our industrial partner AbOvo, we provide a comprehensive overview of the air cargo planning problem. We formalize its requirements and the objectives. Furthermore, we develop and evaluate suitable solution approaches. We solve the full planning problem simultaneously by using integer linear programming and make all individual shipments catch their related connection flights on time.
 	
 \end{abstract}
 
@@ -119,12 +119,9 @@ $\newline$
 \label{sec:introduction}
 
 $\newline$
-An international airline hub needs to plan the air cargo movement so that all shipments catch their connecting flights or road connections. Air cargo shipments are transported in so-called unit load devices (ULDs). A ULD contains many shipments which need to go different final destinations. Hence, at the first step of the whole process, the incoming ULDs are broken down at the arrival. Here in the breakdown zone (BD), ULDs have to be unpacked and seperated. The seperate shipments are transported in the warehouse to wait for the build up call. These shipments are then moved to packing area which is called buildup zone (BU). At the end, outbound ULDs are constructed with these shipments and they are taken to the outbound flight for loading. All zones have different attributes such as number of workstations, capacities, transportation times between zones and the warehouse. Shipments also have different attributes such as priority and weight. Regarding all the attributes, constraints and the parameters which are stated in detail in problem description, the goal of the optimization process is to build up all ULDs as soon as possible to make them catching their connections.
-$\newline$
-
+An international airline hub needs to plan the air cargo movement so that all shipments catch their connecting flights or road connections. Air cargo shipments are transported in so-called unit load devices (ULDs). It allows a large quantity of cargo to be bundled into a single unit like a pallet or a container. A ULD may contain many shipments which need to go different final destinations. Hence, at the first step of the whole process in Figure 1, the incoming ULDs are broken down on arrival. Here in the breakdown zone (BD), ULDs have to be unpacked and seperated. The seperate shipments are transported to the warehouse to wait for the build up call. These shipments are then moved to the packing area which is called buildup zone (BU). At the end, outbound ULDs are constructed from these shipments, and they are taken to the outbound flight for loading. All zones have different attributes such as the number of workstations, capacities, transportation times between zones and the warehouse. Shipments also have different attributes such as priority and weight. Regarding all the attributes, constraints and the parameters which are stated in detail in the problem description section, the goal of the optimization process is to build up all ULDs as soon as possible to make them catch their connections.
 
 %\noindent\includegraphics[width=18cm]{1_process.png}\qquad
-$\newline$
 
 \begin{figure}[hbt!]
 	\centering
@@ -133,28 +130,27 @@ $\newline$
 	\label{fig:The Process That Takes Place at a Hub}
 \end{figure}
 
-$\newline$
-
-\newpage
-
 \section{Problem Description}
 \label{sec:problemdescription}
 
 $\newline$
-The process of one shipment begins in drop zone when it comes to the airport in an inbound ULD. ULDs are unloaded from an aircraft by the ground handling agent and placed in a drop zone (not part of our planning puzzle). There are 4 drop zones and each drop zone has different number of workstations. Each ULD has a scheduled arrival and at a later stage an actual arrival time. From drop zone, each ULD has to be taken to the breakdown zone to get unpacked. Our problem also starts here. There are different distances between each drop zone and each breakdown zone. The sample distances between some of the drop zones and some of the BD zones are given below in the table:
+The whole handling process of one shipment begins in the drop zones when it comes to the airport in an inbound ULD. There are 4 drop zones in the airport. ULDs are unloaded from an aircraft by the ground handling agent and placed in one of the drop zones (not part of our planning problem). Each drop zone has different number of workstations. Each ULD has a scheduled arrival and at a later stage an actual arrival time. From the drop zone, each ULD has to be taken to the breakdown zone to get unpacked. Our problem starts here. There are different distances between each drop zone and each breakdown zone. 
 
-$\newline$
+%The sample distances between some of the drop zones and some of the BD zones are given below in the Figure 2.
+
+%\newpage
+
 %\noindent\includegraphics[width=12cm]{distances_drop_bdzone.png}\qquad
 
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=100mm,scale=1.5]{distances_drop_bdzone.png}
-	\caption{Sample Distances Between Drop Zone and Break Down Zone}
-	\label{fig:Sample Distances Between Drop Zone and Break Down Zone}
-\end{figure}
+%\begin{figure}[hbt!]
+%	\centering
+%	\includegraphics[width=100mm,scale=1.5]{distances_drop_bdzone.png}
+%	\caption{Sample Distances Between Drop Zone and Break Down Zone}
+%	\label{fig:Sample Distances Between Drop Zone and Break Down Zone}
+%\end{figure}
 
 $\newline$
-In BD zone, ULDs are seperated into shipments. There are 12 different BD zones in the hub. So they are located at different places of the airport. Thus all BD zones have different attributes. Attributes related to BD zones are below: 
+In BD zone, ULDs are seperated into shipments. There are 12 different BD zones in the hub that are located at different places of the airport. Thus all BD zones have different attributes. Attributes related to BD zones are: 
 
 \begin{itemize}
 	\item Different characteristics for each BD zone for example some of the BD zones are for animals, some of them are for cooled products and the others are normal BD zones.
@@ -163,17 +159,16 @@ In BD zone, ULDs are seperated into shipments. There are 12 different BD zones i
 	\item Different handling times per ULD.
 \end{itemize}
 
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=150mm,scale=1.0]{BDZones.png}
-	\caption{Break Down Zone Attributes}
-	\label{fig:Break Down Zone Attributes}
-\end{figure}
+%\begin{figure}[hbt!]
+%	\centering
+%	\includegraphics[width=150mm,scale=1.0]{BDZones.png}
+%	\caption{Break Down Zone Attributes}
+%	\label{fig:Break Down Zone Attributes}
+%\end{figure}
 
 %\noindent\includegraphics[width=30cm]{BDZones.png}\qquad
 
-$\newline$
-Within the BD zone, the decision needs to be taken in which order the ULDs should be unpacked. ULDs need to be broken down early enough, so all shipments can make their connections or promised pickup time. There are 3 different shipments within the hub. Cooling products, normal products (NRML) and animals (NML). Also each shipment has different priorities in these BD zones. Because some of the shipments may be animals or cooled products which are mentioned above and need to be processed before the regular shipments. ULDs contain a shipment with a high priority, need to be unpacked earlier than the others. Each shipment within the ULD is either in transit and needs to catch the connecting flight or will be further transported on the road usually by truck (not part of our planning puzzle) or is picked up from the warehouse by a customer. When the shipments are in transit and unpacked, depending on the scheduled departure time of the connection flight on which cargo is booked, it is either stored temporarily in the warehouse or directly sent to build up process. The warehouse (WH) is fully automated and with the assumption, that there are never capacity constraints in the WH. As soon as enough stock is available in the storage WH to build up one ULD for a specific aircraft, these can be requested to be provided to the BU zone.
+Within the BD zone, the decision needs to be taken in which order the ULDs should be unpacked. ULDs need to be broken down early enough, so all shipments can make their connections or promised pickup time. There are 3 different shipments within the hub. Cooled products, normal products and animals. Each shipment has different priority in the BD zones. For example, animals or cooled products need to be processed before the regular shipments. ULDs that contain a shipment with a high priority need to be unpacked earlier than the others. Each shipment in transit within the ULD needs to catch the connecting flight. When the shipments are unpacked, depending on the scheduled departure time of the connection flight on which cargo is booked, it is either stored temporarily in the warehouse or directly sent to the build up process. The warehouse (WH) is fully automated and with the assumption, that there are never capacity constraints in the WH. As soon as enough stock is available in the storage WH to build up one ULD for a specific aircraft, these can be requested to be provided to the BU zone.
 
 $\newline$
 In a next step the shipments are built up again to ULDs depending on their connecting flight. This is done within a build up zone (BU zone). A departing aircraft type has a link to a specific BU zone, so with the provided information which aircraft the shipment should go on, the BU zone is known. Here again a shipment with a high priority has to be built up earlier then the other shipments. There are 8 different BU zones and each BU zone has different number of workstations within. At each work station one ULD can be built up at the same time. The shipments are provided from the storage WH to the chosen work station. If the building up of two ULDs for the same aircraft are planned at one work station, it is not allowed to build up a ULD for a different aircraft in between, even if there is some idle time. The reason is that after building up one ULD there might be some shipments with the same destination left. It should be avoided to move those around, so they would stay at the work station for the build up of the next ULD for the same aircraft. From each BU zone, there are different transportation times to each flight. In addition to this, there are different default processing times for each flight which is also given in the data. This means each ULD has additional processing time before the regarding flight. Here for all ULDs, the capacity is the same which is 400 kg. For some of the flights, there is a pre-processing buffer time necessary to consider. Sample tables related to these characteristics are given below for a clear understanding:
@@ -181,12 +176,12 @@ In a next step the shipments are built up again to ULDs depending on their conne
 \begin{itemize}
 	\item Different handling times and transport times from the WH for each BU zone.
 	
-	\begin{figure}[hbt!]
-		\centering
-		\includegraphics[width=100mm,scale=1.5]{buzone_data1.png}
-		\caption{Handling Times and Transportation Times from Warehouse to BU Zones}
-		\label{fig:Handling Times and Transportation Times from Warehouse to BU Zones}
-	\end{figure}
+	%\begin{figure}[hbt!]
+	%	\centering
+	%	\includegraphics[width=100mm,scale=1.5]{buzone_data1.png}
+	%	\caption{Handling Times and Transportation Times from Warehouse to BU Zones}
+	%	\label{fig:Handling Times and Transportation Times from Warehouse to BU Zones}
+	%\end{figure}
 
 \end{itemize}
 
@@ -196,28 +191,26 @@ In a next step the shipments are built up again to ULDs depending on their conne
 
 	\item Sample workstations within some BU zones.
 	
-	\begin{figure}[hbt!]
-		\centering
-		\includegraphics[width=40mm,scale=1.0]{sample_ws_bu.png}
-		\caption{Workstations in BU Zones}
-		\label{fig:Workstations in BU Zones}
-	\end{figure}
+%	\begin{figure}[hbt!]
+	%	\centering
+	%	\includegraphics[width=40mm,scale=1.0]{sample_ws_bu.png}
+	%	\caption{Workstations in BU Zones}
+	%	\label{fig:Workstations in BU Zones}
+%	\end{figure}
 	%%\noindent\includegraphics[width=8cm]{sample_ws_bu.png}\qquad
 
 \end{itemize}
-
-\newpage
 
 \begin{itemize}
 
 	\item Sample flights related to some BU zones and the transportation time between the flight and the BU zone.
 	
-	\begin{figure}[hbt!]
-		\centering
-		\includegraphics[width=90mm,scale=1.5]{sample_bu_flight.png}
-		\caption{Sample Flights Related to BU Zones and Transpotation Times}
-		\label{fig:Sample Flights Related to BU Zones and Transpotation Times}
-	\end{figure}
+	%\begin{figure}[hbt!]
+	%	\centering
+	%	\includegraphics[width=90mm,scale=1.5]{sample_bu_flight.png}
+	%	\caption{Sample Flights Related to BU Zones and Transpotation Times}
+	%	\label{fig:Sample Flights Related to BU Zones and Transpotation Times}
+%	\end{figure}
 	%%\noindent\includegraphics[width=10cm]{sample_bu_flight.png}\qquad
 
 \end{itemize}
@@ -226,19 +219,19 @@ In a next step the shipments are built up again to ULDs depending on their conne
 
 	\item Pre-processing buffer times for the flights.
 	
-	\begin{figure}[hbt!]
-		\centering
-		\includegraphics[width=90mm,scale=1.5]{preprocess_time.png}
-		\caption{Pre-Processing Times of the Flights}
-		\label{fig:Pre-Processing Times of the Flights}
-	\end{figure}
+	%\begin{figure}[hbt!]
+	%	\centering
+	%	\includegraphics[width=90mm,scale=1.5]{preprocess_time.png}
+	%	\caption{Pre-Processing Times of the Flights}
+	%	\label{fig:Pre-Processing Times of the Flights}
+%	\end{figure}
 	%%\noindent\includegraphics[width=10cm]{preprocess_time.png}\qquad
 	
 \end{itemize}
 
 The goal is to build up all ULDs as soon as possible to make the connections, while the work should be processed in batches, to avoid unnecessary transportation within the BU zone.
 
-\newpage
+%\newpage
 
 
 \section{Mathematical Model for the Problem}
