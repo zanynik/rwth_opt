@@ -276,9 +276,6 @@ $\textcolor{black}{T_{ij}}$ : Time taken to transport an ULD ${\color{black}i}$ 
 $\textcolor{black}{T_{j}}$ : Time taken to transport shipments from ${\color{black}i}$ to BD zone ${\color{black}j}$ to Warehouse
 
 
-
-$\newline$
-
 \subsubsection{Decision Variables for Break Down Process}
 \label{sec:DVBDZone}
 
@@ -288,19 +285,11 @@ $\newline$
 
 $\textcolor{black}{x_{ij}^{t}\in\{0,1\}, \forall {i \in I, j \in J, t \in T}}$ : if a ULD i is assigned to BD zone j at time t or not.
 
-$\newline$
-
- $y_{lij}^t$ is another binary decision variable which indicates whether each shipment l in ULD i is assigned to a BD zone j at time t or not 
-
-$\newline$
-
-$\textcolor{black}{y_{lij}^{t}\in\{0,1\}, \forall {i \in I, j \in J, j \in L_k, t \in T}}$
-
 
 \subsubsection{Constraints for Break Down Process}
 \label{sec:constraintsBDZone}
 
-For BD zone processes we have three constraints. The first one (1) is the constraint that ensures that the ULD is assigned at a feasible time, the second one (2) is an assignment constraint which means all ULDs have to be assigned to exactly one BD zone and the third one (2) is the capacity constraint. 
+For BD zone processes we have several constraints. The first one (1) is the constraint that ensures that the ULD is assigned at a feasible time, the second one (2) is an assignment constraint which means all ULDs have to be assigned to exactly one BD zone.
 
 $\newline$
 The time at which Break down of  ULD i starts, $t_{i,start} = \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t . x_{ij}^t $
@@ -309,7 +298,7 @@ $\newline$
 Each ULD takes i  $T_{ij}$ time to travel to its assigned BD zone j, therefore the following constraint ensures that the start time of ULD i is greater than the sum of its arrival time and transportation time :
 $\newline$
 \begin{align}
-\sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t . x_{ij}^t \ge a_{i} + T_{ij},  \qquad i \in I
+\sum_{j \in J}\sum_{t=a_{i} - T_{ij}}^{d_{i}} t . x_{ij}^t \ge a_{i} ,  \qquad i \in I
 \end{align}
 
 Each ULD i must be assigned to a BD zone j before the earliest departure time of the shipment it contains. We will further tighten this time limit in other constraints that follow. The following constraint ensures that each ULD is assigned : 
@@ -318,7 +307,7 @@ Each ULD i must be assigned to a BD zone j before the earliest departure time of
 \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
 
-For multiple dropzone ULD's
+For the special case given in this problem, where we have multiple drop zones, the each ULD has to be assigned to multiple BD zones associated with it. In the constraints (3) and (4), we assign such multiple drop zone ULDs to their respective BD zones i.e animal BD zone and normal BD zone.
 \begin{align}
 \sum_{j \in J_{NML}}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
@@ -327,9 +316,17 @@ For multiple dropzone ULD's
 \sum_{j \in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
 
+In the fifth consraint (5), we say that for multiple drop zone ULDs, animal BD zone has to be assigned before the regular shipment BD zone.
+
+$J_{NML} \bigcup J_{NRML} = J$
+
+\begin{align}
+\sum_{j\in J_{NML}}\sum_{t=a_{i}}^{d_{i}} (t + h_{j}) . x_{ij}^t  \le \sum_{j\in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} (t) . x_{ij}^t
+\end{align}
+
 
 $\newline$
-In the third constraint (3), we say that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
+The sixth one (6) is the capacity constraint. In the sixth constraint (6), we say that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
 If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I \setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
 
 \begin{align}
@@ -344,13 +341,7 @@ $\newline$
 ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}}{\color{black}{(t + h_{j})}} . x_{ij}^t$
 
 $\newline$
-Lets consider the journey of each shipment as in Figure 3. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then it also means that all shipments in ULD i are assigned at that time t to BD zone j.
-
-$J_{NML} \bigcup J_{NRML} = J$
-
-\begin{align}
-\sum_{j\in J_{NML}}\sum_{t=a_{i}}^{d_{i}} (t + h_{j}) . x_{ij}^t  \le \sum_{j\in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} (t) . x_{ij}^t
-\end{align}
+Lets consider the journey of each shipment as in Figure 3 shown below. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then $x_{ij}^t = 1$ and it also means that all shipments in ULD i are assigned at that time t to BD zone j.
 
 
 \begin{figure}[hbt!]
@@ -359,9 +350,6 @@ $J_{NML} \bigcup J_{NRML} = J$
 	\caption{Journey of Shipment}
 	\label{fig:Journey of Shipment}
 \end{figure}
-
-$\newline$
-At this phase, priorities are not considered in our model in BD zones.
 
 \subsection{Build Up Process}
 \label{sec:ParamBUZone}
@@ -378,13 +366,13 @@ We define parameters for flights and Build up zones :
 \subsubsection{Decision Variables for Build Up Process}
 \label{sec:DVBDZone}
 
-In the Build Up zone, the decision needs to be taken regarding which shipments should be assigned to which workstation at what time in a given Build up zone. For this reason, we introduce a decision variable:  ${z_{lkm}^{t}}$
+In the Build Up zone model, the decision needs to be taken regarding which shipments should be assigned to which workstation at what time in a given Build Up zone. For this reason, we introduce a decision variable:  ${z_{lm}^{t}}$
 
 $\newline$
 Shipment  \textcolor{black}{$l$} having departure flight  \textcolor{black}{$k$} is assigned to one of  \textcolor{black}{$"m"$} workstations in its BU Zone.
 $\newline$
 
-$\textcolor{black}{z_{lm_{k}}^{t}\in\{0,1\}, \forall {i \in I, l \in L_i, m \in M_k, t \in T}}$
+$\textcolor{black}{z_{lm}^{t}\in\{0,1\}, \forall {i \in I, l \in L_i, m \in M_k, t \in T}}$
 $\newline$
 
 
@@ -400,7 +388,7 @@ $\newline$
 All shipments must be assigned to a workstation in its designated Build up zone.
 $\newline$
 \begin{align}
-\sum_{m \in M}\sum_{t=a_{l}}^{d_l} z_{lm_{k}}^{t} = 1  \qquad \forall k \in K, \forall l \in L_k  
+\sum_{m \in M}\sum_{t=a_{l}}^{d_l} z_{lm}^{t} = 1  \qquad \forall k \in K, \forall l \in L_k  
 \end{align}
 
 $\newline$
@@ -408,7 +396,7 @@ If shipments in subset  $\textcolor{black}{l\in\ L_k }$ start at $\textcolor{bla
 $\newline$
 
 \begin{align}
-Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm_{k}}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pm_{k}}^{\tau}.w_l , \qquad \forall k \in K, \forall m \in M_k, \forall t \in T  
+Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pm}^{\tau}.w_l , \qquad \forall k \in K, \forall m \in M_k, \forall t \in T  
 \end{align}
 
 
@@ -418,7 +406,7 @@ The number of workstation in the Build up zone that are to be assigned to build 
 $\newline$
 
 \begin{align}
-\sum_{m \in M_k}\sum_{t=a_l}^{d_k}{Q_{mk}^{t}} \le \dfrac{\sum_{l \in L_k}\sum_{m \in M}\sum_{t=a_l}^{d_k}{z_{lm_{k}}^{t} w_{l}}}{W} + 1 ,  \qquad \forall k \in K
+\sum_{m \in M_k}\sum_{t=a_l}^{d_k}{Q_{mk}^{t}} \le \dfrac{\sum_{l \in L_k}\sum_{m \in M}\sum_{t=a_l}^{d_k}{z_{lm}^{t} w_{l}}}{W} + 1 ,  \qquad \forall k \in K
 \end{align}
 
 $\newline$
@@ -452,21 +440,19 @@ For Multiple DZ ULDs we have to consider only NRML BD zone assignments for writi
  \sum_{j \in J_{NRML}}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t . t \qquad \forall i \in I , \forall l \in L_{i}
 \end{align}
 
-
-\subsection{Objective Function}
-\label{sec:objBUZone}
-
 Slack for each shipment is given by difference in departure time and the time at which shipments are built up into ULDs. Let this slack time for each shipment be greater than ${s_{min}}$
 
 \begin{align}
  ( d_{l} + p_{k}) - (z_{lm_{k}}^t .(t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
 \end{align}
-
 \begin{align}
 s_{min} \ge 0
 \end{align}
 
-By maximising the minimum slack of all shipments we ensure that each shipment is ready well before its departure time.
+\subsection{Objective Function}
+\label{sec:objBUZone}
+
+By maximizing the minimum slack of all shipments, we ensure that each shipment is ready well before its departure time.
 
 \begin{equation*}
 \max s_{min}
@@ -476,10 +462,10 @@ By maximising the minimum slack of all shipments we ensure that each shipment is
 \section{Solving The Problem and The Model Output}
 \label{sec:modeloutput}
 
-We implemented all presented models in Jupyter Notebook using Gurobi for Python. It takes three hours for the entire model to find a solution. As a result, all shipments catch their flights on time as our goal in this project. 
+We implemented all presented models in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model. In the solution, we see that all shipments catch their flights on time as our goal in this project. 
 
 $\newline$
-To choose a planning horizon that fits our needs, we evaluated different planning horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to make it dynamic as relevant handling times for each BD zones. For the BU zones, it is specified as one minute.
+To choose a planning time horizon that fits our needs, we evaluated different planning time horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to discretize the time in handling time intervals for each BD zone. For the BU zones, time is discretized in one minute intervals.
 
 $\newline$
 When we analyze the result for the BD zones, we can see in both Figure 5 and Figure ... that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
