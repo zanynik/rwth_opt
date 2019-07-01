@@ -237,15 +237,16 @@ The goal is to build up all ULDs as soon as possible to make the connections, wh
 \section{Mathematical Model for the Problem}
 \label{sec:mathmodel}
 
-Our mathematical model for this problem is a combination of two puzzles, which are Break Down Zone and the Build Up Zone assignments. 
+Our mathematical model for this problem is a combination of two puzzles, which are Break Down Zone and the Build Up Zone assignments. The overall view of the general process can be seen in Figure 2 below.
 
 $\newline$ 
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=150mm,scale=1.5]{Aircargo_overall.png}
+	\includegraphics[width=170mm,scale=1.5]{Aircargo_overall.png}
+	\caption{Overall View for The Aircargo Process}
+	\label{fig:Overall View for The Aircargo Process}
 \end{figure}
-
 
 \subsection{Break Down Process}
 \label{sec:ParamBDZone}
@@ -343,7 +344,7 @@ $\newline$
 ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}}{\color{black}{(t + h_{j})}} . x_{ij}^t$
 
 $\newline$
-Lets consider the journey of each shipment. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then it also means that all shipments in ULD i are assigned at that time t to BD zone j.
+Lets consider the journey of each shipment as in Figure 3. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then it also means that all shipments in ULD i are assigned at that time t to BD zone j.
 
 $J_{NML} \bigcup J_{NRML} = J$
 
@@ -361,8 +362,6 @@ $J_{NML} \bigcup J_{NRML} = J$
 
 $\newline$
 At this phase, priorities are not considered in our model in BD zones.
-
-$\newline$
 
 \subsection{Build Up Process}
 \label{sec:ParamBUZone}
@@ -430,10 +429,10 @@ $\newline$
 1 - {Q_{mk}^{t}} \ge \sum_{q \in K \setminus \{k\}}  \sum_{\tau = t}^{t + b_{k}}{Q_{mq}^{t}} ,  \qquad \forall k \in K , \forall m \in M_{k}, \forall t \in T
 \end{align}
 
-\subsubsection{Precedence constraints}
-\label{sec:ParamBUZone}
+%\subsubsection{Precedence constraints}
+%\label{sec:ParamBUZone}
 
-In the entire timeline of a shipment from its arrival to departure we have a precedence contraint on processes a shipment goes through. The Break down process preceeds the Build up process and hence The assigment for BD zone should happen before Workstation assignment in a BU Zone.
+In the entire timeline of a shipment from its arrival to departure as in Figure 4, we have a precedence contraint on processes a shipment goes through. The Break down process preceeds the Build up process and hence The assigment for BD zone should happen before Workstation assignment in a BU Zone.
 
 \begin{figure}[hbt!]
 	\centering
@@ -473,7 +472,32 @@ By maximising the minimum slack of all shipments we ensure that each shipment is
 \max s_{min}
 \end{equation*}
 
+
+\section{Solving The Problem and The Model Output}
+\label{sec:modeloutput}
+
+We implemented all presented models in Jupyter Notebook using Gurobi for Python. It takes three hours for the entire model to find a solution. As a result, all shipments catch their flights on time as our goal in this project. 
+
 $\newline$
+To choose a planning horizon that fits our needs, we evaluated different planning horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to make it dynamic as relevant handling times for each BD zones. For the BU zones, it is specified as one minute.
+
+$\newline$
+When we analyze the result for the BD zones, we can see in both Figure 5 and Figure ... that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{ShipmentArrivalTimeAndBDZones.jpeg}
+	\caption{Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+	\label{fig:Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+\end{figure}
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{FlightDepTimesAndBUZones.jpeg}
+	\caption{Flight Departure Times (X-axis) and BU Zones (Y-axis)}
+	\label{fig:Flight Departure Times (X-axis) and BU Zones (Y-axis)}
+\end{figure}
 
 %\subsection{Overall Model}
 %\label{sec:overallModel}
