@@ -95,14 +95,14 @@
 \author{Ilkim Canoler \\ Luckshan Sivakumar \\  Nikhil Kulkarni \\ Karthikeyan Ramasubbu \\ Shekhar Dure}
 $\newline$
 $\newline$
-\date{12th June 2019}
+\date{8th July 2019}
 \maketitle
 \thispagestyle{empty}
 
 
 $\newline$
 \begin{abstract}
-	In this study, we solve an operational planning problem in the air cargo industry. In an international airline hub, all shipments which are arrived at airport, go through several processes such as breaking down and building up. At the end, all have to catch their connection flight on time. Due to the complexity of the overall puzzle, current practices at airlines are to split up the puzzle into two smaller and thus simpler puzzles. The goal of this case is to solve the full planning problem simultaneously or when solving separately considering the dependencies between the two parts. Working with our industrial partner AbOvo, we provide a comprehensive overview of the air cargo planning problem. We formalize its requirements and the objectives. Furthermore, we develop and evaluate suitable solution approaches. We solve the full planning problem simultaneously by using integer linear programming and make all individual shipments catch their related connection flights on time.
+	In this study, we solve an operational planning problem in the air cargo industry. In an international airline hub, all shipments which arrive at the airport and have to go to another destination need to go through two processes, namely, breaking down of the ULD they arrived in and building up of ULD for their destination flight. The final goal is that all shipments have to catch their connection flight on time. Due to the complexity of the overall puzzle, current practices at airlines are to split up the puzzle into two smaller and thus simpler puzzles. The goal of this paper is to solve the full planning problem using a single model. Working with our industrial partner AbOvo, we provide a comprehensive overview of the air cargo planning problem. We formalize its requirements and the objectives. Furthermore, we develop and evaluate suitable solution approaches. We solve the full planning problem by using integer linear programming.
 	
 \end{abstract}
 
@@ -119,7 +119,7 @@ $\newline$
 \label{sec:introduction}
 
 $\newline$
-An international airline hub needs to plan the air cargo movement so that all shipments catch their connecting flights or road connections. Air cargo shipments are transported in so-called unit load devices (ULDs). It allows a large quantity of cargo to be bundled into a single unit like a pallet or a container. A ULD may contain many shipments which need to go different final destinations. Hence, at the first step of the whole process in Figure 1, the incoming ULDs are broken down on arrival. Here in the breakdown zone (BD), ULDs have to be unpacked and seperated. The seperate shipments are transported to the warehouse to wait for the build up call. These shipments are then moved to the packing area which is called buildup zone (BU). At the end, outbound ULDs are constructed from these shipments, and they are taken to the outbound flight for loading. All zones have different attributes such as the number of workstations, capacities, transportation times between zones and the warehouse. Shipments also have different attributes such as priority and weight. Regarding all the attributes, constraints and the parameters which are stated in detail in the problem description section, the goal of the optimization process is to build up all ULDs as soon as possible to make them catch their connections.
+An international airline hub needs to plan the air cargo movement so that all shipments catch their connecting flights or road connections. Air cargo shipments are transported in so-called unit load devices (ULDs). It allows a large quantity of cargo to be bundled into a single unit like a pallet or a container. A ULD may contain many shipments which need to go to different final destinations. Hence, at the first step of the whole process as seen in Figure 1 below, the incoming ULDs are broken down on arrival. Here in the breakdown zone (BD), ULDs have to be unpacked and seperated. The seperate shipments are then transported to the warehouse and stored there. These shipments are then moved to the packing area which is called buildup zone (BU). Finally, the outbound ULDs are constructed from these shipments, and they are taken to the outbound flight for loading. Each zone has different attributes such as capacitiy for BD zone, the number of workstations for BU zone, transportation times between zones and the warehouse and handling times for process in each zone. Shipments have different attributes namely shipment id, destination flight number, date of arrival and departure, type of shipment and weight. Using all the attributes , we formulate the problem as an Integer linear program by writing constraints and the parameters which are stated in detail in the problem description section. The goal of the optimization process is to build up all ULDs such that there is sifficient time available for them to catch their flight connections.
 
 %\noindent\includegraphics[width=18cm]{1_process.png}\qquad
 
@@ -134,7 +134,7 @@ An international airline hub needs to plan the air cargo movement so that all sh
 \label{sec:problemdescription}
 
 $\newline$
-The whole handling process of one shipment begins in the drop zones when it comes to the airport in an inbound ULD. There are 4 drop zones in the airport. ULDs are unloaded from an aircraft by the ground handling agent and placed in one of the drop zones (not part of our planning problem). Each drop zone has different number of workstations. Each ULD has a scheduled arrival and at a later stage an actual arrival time. From the drop zone, each ULD has to be taken to the breakdown zone to get unpacked. Our problem starts here. There are different distances between each drop zone and each breakdown zone. 
+In the given problem, shipments arrive in the form of an ULD at four types of Drop Zones (DZ) in the airport. ULDs are unloaded from an aircraft by the ground handling agent and placed in one of the drop zones. The decision to assign the DZ is not a part of our planning problem in this paper as it has already been given in the data associated with each shipment. From the drop zone, each ULD has to be transported to the breakdown zone to be broken down into shipments. The decision of allocating an ULD to a BD zone has to be taken at this point.
 
 %The sample distances between some of the drop zones and some of the BD zones are given below in the Figure 2.
 
@@ -150,13 +150,13 @@ The whole handling process of one shipment begins in the drop zones when it come
 %\end{figure}
 
 $\newline$
-In BD zone, ULDs are seperated into shipments. There are 12 different BD zones in the hub that are located at different places of the airport. Thus all BD zones have different attributes. Attributes related to BD zones are: 
+In BD zone, ULDs are seperated into shipments. There are 12 different BD zones in the hub that are located at different places of the airport. Attributes related to BD zones are: 
 
 \begin{itemize}
-	\item Different characteristics for each BD zone for example some of the BD zones are for animals, some of them are for cooled products and the others are normal BD zones.
-	\item Different number of workstations within the BD zone.
-	\item Different transportation times to the warehouse.
-	\item Different handling times per ULD.
+	\item Type of shipment a BD zone handles. For examle  : some of the BD zones handle only ULDs containing animals, some of them handle only cooled products and others handle regular ULDs.
+	\item Capacity of the BD zone.
+	\item Transportation times from DZ and to Warehouse.
+	\item Handling time per ULD.
 \end{itemize}
 
 %\begin{figure}[hbt!]
@@ -168,13 +168,15 @@ In BD zone, ULDs are seperated into shipments. There are 12 different BD zones i
 
 %\noindent\includegraphics[width=30cm]{BDZones.png}\qquad
 
-Within the BD zone, the decision needs to be taken in which order the ULDs should be unpacked. ULDs need to be broken down early enough, so all shipments can make their connections or promised pickup time. There are 3 different shipments within the hub. Cooled products, normal products and animals. Each shipment has different priority in the BD zones. For example, animals or cooled products need to be processed before the regular shipments. ULDs that contain a shipment with a high priority need to be unpacked earlier than the others. Each shipment in transit within the ULD needs to catch the connecting flight. When the shipments are unpacked, depending on the scheduled departure time of the connection flight on which cargo is booked, it is either stored temporarily in the warehouse or directly sent to the build up process. The warehouse (WH) is fully automated and with the assumption, that there are never capacity constraints in the WH. As soon as enough stock is available in the storage WH to build up one ULD for a specific aircraft, these can be requested to be provided to the BU zone.
+The inbound ULDs are classified into product categories of, 'Cooled', 'normal' and 'animals'. When the shipments are unpacked, depending on the scheduled departure time of the connection flight it is booked for, it is either stored temporarily in the warehouse or directly sent to the build up process. The warehouse (WH) is fully automated and with the assumption, that there are never capacity constraints in the WH. As soon as enough stock is available in the storage WH to build up one ULD for a specific aircraft, these can be requested to be provided to the BU zone.
 
 $\newline$
-In a next step the shipments are built up again to ULDs depending on their connecting flight. This is done within a build up zone (BU zone). A departing aircraft type has a link to a specific BU zone, so with the provided information which aircraft the shipment should go on, the BU zone is known. Here again a shipment with a high priority has to be built up earlier then the other shipments. There are 8 different BU zones and each BU zone has different number of workstations within. At each work station one ULD can be built up at the same time. The shipments are provided from the storage WH to the chosen work station. If the building up of two ULDs for the same aircraft are planned at one work station, it is not allowed to build up a ULD for a different aircraft in between, even if there is some idle time. The reason is that after building up one ULD there might be some shipments with the same destination left. It should be avoided to move those around, so they would stay at the work station for the build up of the next ULD for the same aircraft. From each BU zone, there are different transportation times to each flight. In addition to this, there are different default processing times for each flight which is also given in the data. This means each ULD has additional processing time before the regarding flight. Here for all ULDs, the capacity is the same which is 400 kg. For some of the flights, there is a pre-processing buffer time necessary to consider. Sample tables related to these characteristics are given below for a clear understanding:
+In a next step, shipments are built up into ULDs depending on their connecting flight. This is done in a build up zone (BU zone). A departing aircraft type has a link to a specific BU zone. So with the provided information on which aircraft the shipment should go on, the BU zone is known. There are 8 different BU zones and each BU zone has different number of workstations in it. At each work station only one ULD can be built up at any given time. The shipments are provided from the storage WH to the chosen work station. From each BU zone, there are different transportation times for ULDs to each flight. In addition to this, there are different pre-processing times for each flight which is also given in the data. Maximum capacity by weight that each built up ULD can have is given as 400 kg.
+
+Some other requirements are that if the building up of two ULDs for the same aircraft are planned at one work station, it is not allowed to build up a ULD for a different aircraft in between, even if there is some idle time. The reason is that after building up one ULD there might be some shipments with the same destination left. It should be avoided to move those around, so they would stay at the work station for the build up of the next ULD for the same aircraft. Listen below are attributes associated with BU zone
 
 \begin{itemize}
-	\item Different handling times and transport times from the WH for each BU zone.
+	\item Handling times to buildup a ULD 
 	
 	%\begin{figure}[hbt!]
 	%	\centering
@@ -186,10 +188,14 @@ In a next step the shipments are built up again to ULDs depending on their conne
 \end{itemize}
 
 	%%\noindent\includegraphics[width=14cm]{buzone_data1.png}\qquad
+\begin{itemize}
+	\item Transport times from the WH
+\end{itemize}
+
 
 \begin{itemize}
 
-	\item Sample workstations within some BU zones.
+	\item Number of workstations
 	
 %	\begin{figure}[hbt!]
 	%	\centering
@@ -203,7 +209,7 @@ In a next step the shipments are built up again to ULDs depending on their conne
 
 \begin{itemize}
 
-	\item Sample flights related to some BU zones and the transportation time between the flight and the BU zone.
+	\item Flights list associated with each BU zones and the transportation time between the flight and the BU zone.
 	
 	%\begin{figure}[hbt!]
 	%	\centering
@@ -229,7 +235,7 @@ In a next step the shipments are built up again to ULDs depending on their conne
 	
 \end{itemize}
 
-The goal is to build up all ULDs as soon as possible to make the connections, while the work should be processed in batches, to avoid unnecessary transportation within the BU zone.
+The goal is to build up all ULDs before the given buffer time so that all can catch the connections.
 
 %\newpage
 
@@ -237,7 +243,7 @@ The goal is to build up all ULDs as soon as possible to make the connections, wh
 \section{Mathematical Model for the Problem}
 \label{sec:mathmodel}
 
-Our mathematical model for this problem is a combination of two puzzles, which are Break Down Zone and the Build Up Zone assignments. The overall view of the general process can be seen in Figure 2 below.
+Our mathematical model for this problem is a combination of two puzzles namely, the Break Down Zone and the Build Up Zone assignments. The overall view of the general process can be seen in Figure 2 below.
 
 $\newline$ 
 
@@ -251,7 +257,7 @@ $\newline$
 \subsection{Break Down Process}
 \label{sec:ParamBDZone}
 
-In BD zones, our model has arrival time parameters for each ULD. Similar to this, each BD zone has its own capacity, handling time and transportation time from drop zone. Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J. Time is discretized into minutes in set T.
+Each ULD is a part of the ULD set I and each BD zone is a part of the BD zones set J. Time is discretized into minutes in set T.
 
 \begin{equation*} ${\color{black} ULD i}$ {}  \in {}  ${\color{black}I}$ {} = {} ${\color{black}\{1,2,3,...,N\}}$  \end{equation*} 
 \begin{equation*} ${\color{black} BD zone j}$ {}  \in {}  ${\color{black}J}$ {} = {} ${\color{black}\{1,2,3,...,M\}}$ \end{equation*} 
@@ -279,7 +285,7 @@ $\textcolor{black}{T_{j}}$ : Time taken to transport shipments from ${\color{bla
 \subsubsection{Decision Variables for Break Down Process}
 \label{sec:DVBDZone}
 
-In the Break Down zone, the decision needs to be taken which ULDs should be assigned to which BD zone at which time. For this reason, the decision variable has to be binary. 1 for the ULD i is assigned to BD zone j at time t, 0 for the ULD i is not assigned to BD zone j at time t. 
+In the Break Down zone, the decision needs to be taken which ULDs should be assigned to which BD zone at which time. For this reason, the decision variable has to be binary. The decision variable takes value 1 if the ULD i is assigned to BD zone j at time t and value 0 if the ULD i is not assigned to BD zone j at time t. 
 
 $\newline$
 
@@ -289,7 +295,7 @@ $\textcolor{black}{x_{ij}^{t}\in\{0,1\}, \forall {i \in I, j \in J, t \in T}}$ :
 \subsubsection{Constraints for Break Down Process}
 \label{sec:constraintsBDZone}
 
-For BD zone processes we have several constraints. The first one (1) is the constraint that ensures that the ULD is assigned at a feasible time, the second one (2) is an assignment constraint which means all ULDs have to be assigned to exactly one BD zone.
+The first constraint (1) ensures that the ULD is assigned at a feasible time, the second constraint (2) ensures that all ULDs have to be assigned to exactly one BD zone.
 
 $\newline$
 The time at which Break down of  ULD i starts, $t_{i,start} = \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t . x_{ij}^t $
@@ -316,7 +322,7 @@ For the special case given in this problem, where we have multiple drop zones, t
 \sum_{j \in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} x_{ij}^{t} = 1 \qquad \forall i \in I
 \end{align}
 
-In the fifth consraint (5), we say that for multiple drop zone ULDs, animal BD zone has to be assigned before the regular shipment BD zone.
+In the fifth consraint (5), we consider the case that for multiple drop zone ULDs, animal BD zone has to be assigned before the regular shipment BD zone.
 
 $J_{NML} \bigcup J_{NRML} = J$
 
@@ -326,7 +332,7 @@ $J_{NML} \bigcup J_{NRML} = J$
 
 
 $\newline$
-The sixth one (6) is the capacity constraint. In the sixth constraint (6), we say that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
+The sixth constraint (6) is the capacity constraint. In the sixth constraint (6), we check that if ULD's in subset i are started to be processed at time t, no more ULDs than the remaining capacity of the BD zone j can start before $t + h_{j}$ , because the process of breaking down the current ULDs needs to be completed.
 If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I \setminus \{i\}$. In the first part of the constraint, we are calculating the remaining capacity for the BD zone at time t . For the second part of the constraint, we are stating that whatever will be assigned in next time period $t + h_{j}$ should be less than or equal to remaining capacity.
 
 \begin{align}
@@ -341,7 +347,7 @@ $\newline$
 ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}}{\color{black}{(t + h_{j})}} . x_{ij}^t$
 
 $\newline$
-Lets consider the journey of each shipment as in Figure 3 shown below. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then $x_{ij}^t = 1$ and it also means that all shipments in ULD i are assigned at that time t to BD zone j.
+Now, let's consider the journey of each shipment as in Figure 3 shown below. Each ULD i has $l \in L_{i}$ shipments in it. If ULD i is assigned at time t to BD zone j, then $x_{ij}^t = 1$ and it also means that all shipments in ULD i are assigned at that time t to BD zone j.
 
 
 \begin{figure}[hbt!]
@@ -375,6 +381,7 @@ $\newline$
 $\textcolor{black}{z_{lm}^{t}\in\{0,1\}, \forall {i \in I, l \in L_i, m \in M_k, t \in T}}$
 $\newline$
 
+The second decision we need to take is regarding the number of workstations that need to be allocated to a flight to start its ULD build up process. For this purpose we introduce the second decision variable in BU zone as follows: 
 
 $\newline$
 ${Q_{mk}^{t}}$ is our binary decision variable to decide if the the Workstation m is assigned to build ULD for Flight k at time t or not. 
@@ -443,7 +450,7 @@ For Multiple DZ ULDs we have to consider only NRML BD zone assignments for writi
 Slack for each shipment is given by difference in departure time and the time at which shipments are built up into ULDs. Let this slack time for each shipment be greater than ${s_{min}}$
 
 \begin{align}
- ( d_{l} + p_{k}) - (z_{lm_{k}}^t .(t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
+ ( d_{l} + p_{k}) - (\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t .(t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
 \end{align}
 \begin{align}
 s_{min} \ge 0
@@ -462,13 +469,13 @@ By maximizing the minimum slack of all shipments, we ensure that each shipment i
 \section{Solving The Problem and The Model Output}
 \label{sec:modeloutput}
 
-We implemented all presented models in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model. In the solution, we see that all shipments catch their flights on time as our goal in this project. 
+We implemented the model in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model, probably due to a very fine time discretization that we used (We can improve the time by using a coarse discretization of time). In the solution, we see that all shipments catch their flights on time as was our goal in this project. 
 
 $\newline$
 To choose a planning time horizon that fits our needs, we evaluated different planning time horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to discretize the time in handling time intervals for each BD zone. For the BU zones, time is discretized in one minute intervals.
 
 $\newline$
-When we analyze the result for the BD zones, we can see in both Figure 5 and Figure ... that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
+When we analyze the result for the BD zones, we can see in both Figure 5 and Figure 6 that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
 
 
 \begin{figure}[hbt!]
