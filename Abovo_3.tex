@@ -466,7 +466,7 @@ By maximizing the minimum slack of all shipments, we ensure that each shipment i
 \end{equation*}
 
 
-\section{Solving The Problem and The Model Output}
+\section{Solution and Discussion}
 \label{sec:modeloutput}
 
 We implemented the model in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model, probably due to a very fine time discretization that we used (We can improve the time by using a coarse discretization of time). In the solution, we see that all shipments catch their flights on time as was our goal in this project. 
@@ -491,6 +491,152 @@ When we analyze the result for the BD zones, we can see in both Figure 5 and Fig
 	\caption{Flight Departure Times (X-axis) and BU Zones (Y-axis)}
 	\label{fig:Flight Departure Times (X-axis) and BU Zones (Y-axis)}
 \end{figure}
+
+\section{Alternate Model for Build Up Process}
+\label{sec:ParamBUZone}
+
+In this alternate model, we define the following for the flights and the time horizons. 
+
+\begin{equation*} ${\color{black} Flight k}$ {}  \in {}  ${\color{black}K}$ {} = {} ${\color{black}\{1,2,3,...,K\}}$  \end{equation*} 
+\begin{equation*} ${\color{black} Time horizon t}$ {}  \in {}  ${\color{black}T}$ {} = {} ${\color{black}\{1,2,3,...,T\}}$ \end{equation*} 
+
+$\newline$
+
+The first constraint is about available weight of shipment of flight k at any time t , which means the summation of the weights of the seperate shipments which are waiting in the warehouse and ready to be built up.
+
+$\newline$
+
+$avail_{kt}$ $\in$ $\mathbb{R}$
+
+$\newline$
+
+The second one is the due time of the build up process for a flight k.
+
+$\newline$
+
+$due_{k}$ $\in$ $\mathbb{R}$
+
+$\newline$
+
+The third one is the total shipment weight as a demand for a flight k.
+
+$\newline$
+
+$dem_{k}$ $\in$ $T$
+
+$\newline$
+
+The fourth one is the maximum number of ULDs building up simultaneously for a flight k. It actually means number of workstations which are working parallel. In practice we only want to build a limited number of ULDs for the same flight at the same time. This leaves more options and time to react to operational problems during build up and allows to build the ULDs on close-by workstations. Let maximum split denote the maximum desired number of parallel build-ups of a flight. Enforcing a hard limit in practice might lead to offloads for flights where the shipment arrives rather late such that the limit is too low to build all ULDs on time. In these cases we want to set a less restrictive limit.
+
+
+As a suitable limit we choose the maximum required parallel build-ups, between any build-up period and the scheduled departure period of the flight, for which all shipments can be packed. For each period t, we determine the shipment weight arriving in the future (weight demand of flight k) $-$ (available weight at time t for flight k) and the weight that could be packed in the remaining time, if no parallel build-ups are allowed. Note that the number of ULDs that can be built sequentially in the time between t and due time for flight k, can be determined as (due date of flight k $-$ t $-$ 1) $/$ (duration to build a ULD for a flight k). The ratio of both gives us the required parallelism and its maximum over the periods the sought limit. If the required parallelism is less than the desired maximum split, we allow maximum split to be built in parallel.
+
+$\newline$
+
+$split_{k}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+The fifth parameter is the number of ULDs scheduled for a flight k. It means that total shipment weight for a flight k is divided into capacity which is 400 kg and gives us the valueof the parameter. 
+
+$\newline$
+
+$uld_{k}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+The sixth one is the duration in minutes for building a ULD for flight k. We actually know which BU zone is used for flight k before, that is why we do not consider here BU zone index.
+
+$\newline$
+
+$dur_{k}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+The seventh one is the weight of an ULD which is 400 kg as stated in the data.
+
+$\newline$
+
+$cap$ $\in$ $\mathbb{R}$
+
+$\newline$
+
+The last one is the number of workstations handling the ULDs during time t. It is for all flights in time horizon t.
+
+$\newline$
+
+$open_{t}$ $\in$ $\mathbb{N}$
+
+$\newline$
+
+
+\subsubsection{Decision Variables for Build Up Process}
+\label{sec:DVBUZone}
+
+The primary decision made by the model is the number of ULDs to start building at each
+period. To calculate the objective value, we introduce further decision variables. One
+part of the objective is to load as much as possible. There are two reasons that might
+prevent us from achieving this goal: First, if not all ULDs can be scheduled for build-up.
+Second, if a ULD is scheduled before enough shipment is available. We capture the effect of
+each reason in one variable.
+
+$\newline$
+
+$\textcolor{black}{start_{kt}\in\mathbb{N}, \forall {k \in K, t \in T}}$ : Number of ULDs started to build at time t for a flight k $t \le due_{k} $ - $dur_{k}$
+
+$\newline$
+
+$\textcolor{black}{offload_{k}\in\mathbb{N}, \forall {k \in K}}$ : Number of NOT scheduled ULDs for flight k
+
+
+$\newline$
+
+$\textcolor{black}{dead_{kt}\in\mathbb{R} \ge 0, \forall {k \in K, t \in T}}$ : Lost weight of shipments on flight k if ULDs are built before enough shipments available at time t
+
+
+$\newline$
+
+\subsubsection{Constraints for Build Up Process}
+\label{sec:constraintsBUZone}
+
+There is no technical reason to restrict the number of ULDs that are
+built in parallel for a segment. However, in practice there might occur problems during
+a build-up when an item cannot be packed onto the planned ULD. In this case, the load
+planner has to find another ULD with enough remaining capacity under massive time
+pressure. The more ULDs that are not started yet, the more options and time he has
+for replanning. Furthermore, if only a few ULDs for a segment are built in parallel, they
+can be assigned to spatially close workstations. This might reduce transport distances
+and improve overview during build-up. We note that, during a period t, the ULDs that
+were started during period (t $-$ $dur_{k}$ $+$ 1) to period t are still work in progress. For each flight k we limit the number of simultaneously built ULDs by splitk as:
+
+\begin{align}
+\sum_{t' \in {T}} start_{kt'} \le split_{k} \qquad \forall k \in K, \forall t \in T
+\end{align} $t - dur_{k} \le t' \le t$
+
+$\newline$
+
+The number of usable workstations is limited. As each workstation
+can process one ULD at a time, we limit the number of simultaneously processed
+ULDs during period t by $open_{t}$. To calculate this number for a point in time,
+we sum up the ULDs of all flights that have been started during earlier periods and
+are not finished yet:
+
+\begin{align}
+\sum_{k \in {K}}\sum_{t' \in {T}} start_{kt'} \le open_{t} \qquad \forall t \in T
+\end{align} $t - dur_{k} \le t' \le t$
+
+$\newline$
+
+\subsubsection{Objective Function}
+\label{sec:objBUZone}
+
+While satisfying all the given constraints, we want to load as much cargo as possible. o maximize the load, we minimize the amount of weight the departing flight lost and the number of ULDs building up unassociated to the departing flight.
+
+\begin{equation*}
+\min \qquad {} (\sum_{k \in K} \sum_{t \in T} dead_{kt} + \sum_{k \in K} offload_{k})
+\end{equation*}
+
+$\newline$
 
 %\subsection{Overall Model}
 %\label{sec:overallModel}
