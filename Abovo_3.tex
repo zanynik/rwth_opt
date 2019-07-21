@@ -240,7 +240,7 @@ The goal is to build up all ULDs before the given buffer time so that all can ca
 %\newpage
 
 
-\section{Mathematical Model for the Problem}
+\section{Mathematical Model}
 \label{sec:mathmodel}
 
 Our mathematical model for this problem is a combination of two puzzles namely, the Break Down Zone and the Build Up Zone assignments. The overall view of the general process can be seen in Figure 2 below.
@@ -339,11 +339,15 @@ If ULDs in subset i start at t in BD zone j, then other ULDs are in $u \in I \se
 c_{j} - \sum_{i \in I} x_{ij}^{t} \ge \sum_{u \in I \setminus \{i\}}\sum_{\tau = t+1}^{t+h_{j}-1} x_{ij}^{\tau} \qquad \forall t \in T, \forall j \in J
 \end{align}
 
-$\newline$
-The effect is no more ULDs than the capacity of BD zone are assigned at any time.
-$\newline$
-$\newline$
+The effect is that no more ULDs than the capacity of BD zone are assigned at any given time. The same equation can be simplieifed if we initially discretize time in a coarse manner i.e instead of discretizing time in minutes, if we discretize time in handling time intervals of the BD zone and define the decision variable only at discretized time values, then we can rewrite the equations as follows:
 
+\begin{align}
+c_{j} - \sum_{i \in I} x_{ij}^{t} \ge 0 \qquad \forall t \in T, \forall j \in J
+\end{align}
+
+The above simplified form of equation ensures that at any given time t in the set T, which contains time values discretized according to handling time intervals, the capacity of BD zone is never violated.
+
+$\newline$
 ULD i is broken down at time, $t_{i,end} =   \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}}{\color{black}{(t + h_{j})}} . x_{ij}^t$
 
 $\newline$
@@ -406,6 +410,13 @@ $\newline$
 Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pm}^{\tau}.w_l , \qquad \forall k \in K, \forall m \in M_k, \forall t \in T  
 \end{align}
 
+Tha above equation ensures that the capacity of a BU zone is not violated. The same equation can be simplifed if we initially discretize time in a coarse manner i.e instead of discretizing time in minutes, if we discretize time in handling time intervals of the BU zone and define the decision variable only at discretized time values, then we can rewrite the equations as follows:
+
+\begin{align}
+Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm}^{t}.w_l \ge 0 \qquad \forall t \in T, \forall j \in J
+\end{align}
+
+The above simplified form of equation ensures that at any given time t in the set T, which contains time values discretized according to handling time intervals, the capacity of BU zone is never violated.
 
 $\newline$
 
@@ -422,6 +433,11 @@ If a workstation 'm' in a buildup zone is assigned to flight k at time t, then n
 $\newline$
 \begin{align}
 1 - {Q_{mk}^{t}} \ge \sum_{q \in K \setminus \{k\}}  \sum_{\tau = t}^{t + b_{k}}{Q_{mq}^{t}} ,  \qquad \forall k \in K , \forall m \in M_{k}, \forall t \in T
+\end{align}
+
+The above equation can also be simplified as follows, when we consider a coarse time discretization as discussed earlier. 
+\begin{align}
+1 - {Q_{mk}^{t}} \ge Q_{mq}^{t} ,  \qquad \forall k \in K , \forall q \in K \setminus \{k\}, \forall m \in M_{k}, \forall t \in T
 \end{align}
 
 %\subsubsection{Precedence constraints}
@@ -466,33 +482,7 @@ By maximizing the minimum slack of all shipments, we ensure that each shipment i
 \end{equation*}
 
 
-\section{Solution and Discussion}
-\label{sec:modeloutput}
-
-We implemented the model in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model, probably due to a very fine time discretization that we used (We can improve the time by using a coarse discretization of time). In the solution, we see that all shipments catch their flights on time as was our goal in this project. 
-
-$\newline$
-To choose a planning time horizon that fits our needs, we evaluated different planning time horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to discretize the time in handling time intervals for each BD zone. For the BU zones, time is discretized in one minute intervals.
-
-$\newline$
-When we analyze the result for the BD zones, we can see in both Figure 5 and Figure 6 that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
-
-
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=150mm,scale=1.0]{ShipmentArrivalTimeAndBDZones.jpeg}
-	\caption{Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
-	\label{fig:Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
-\end{figure}
-
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=150mm,scale=1.0]{FlightDepTimesAndBUZones.jpeg}
-	\caption{Flight Departure Times (X-axis) and BU Zones (Y-axis)}
-	\label{fig:Flight Departure Times (X-axis) and BU Zones (Y-axis)}
-\end{figure}
-
-\section{Alternate Model for Build Up Process}
+\subsection{Alternate Model for Build Up Process}
 \label{sec:ParamBUZone}
 
 In this alternate model, we define the following for the flights and the time horizons. 
@@ -537,7 +527,7 @@ $split_{k}$ $\in$ $\mathbb{N}$
 
 $\newline$
 
-The fifth parameter is the number of ULDs scheduled for a flight k. It means that total shipment weight for a flight k is divided into capacity which is 400 kg and gives us the valueof the parameter. 
+The fifth parameter is the number of ULDs scheduled for a flight k. It means that total shipment weight for a flight k is divided into capacity which is 400 kg and gives us the value of the parameter. 
 
 $\newline$
 
@@ -562,9 +552,7 @@ $cap$ $\in$ $\mathbb{R}$
 $\newline$
 
 The last one is the number of workstations handling the ULDs during time t. It is for all flights in time horizon t.
-
 $\newline$
-
 $open_{t}$ $\in$ $\mathbb{N}$
 
 $\newline$
@@ -573,12 +561,7 @@ $\newline$
 \subsubsection{Decision Variables for Build Up Process}
 \label{sec:DVBUZone}
 
-The primary decision made by the model is the number of ULDs to start building at each
-period. To calculate the objective value, we introduce further decision variables. One
-part of the objective is to load as much as possible. There are two reasons that might
-prevent us from achieving this goal: First, if not all ULDs can be scheduled for build-up.
-Second, if a ULD is scheduled before enough shipment is available. We capture the effect of
-each reason in one variable.
+The primary decision made by the model is the number of ULDs to start building at each period. To calculate the objective value, we introduce further decision variables. One part of the objective is to load as much as possible. There are two reasons that might prevent us from achieving this goal: First, if not all ULDs can be scheduled for build-up. Second, if a ULD is scheduled before enough shipment is available. We capture the effect of each reason in one variable.
 
 $\newline$
 
@@ -599,15 +582,8 @@ $\newline$
 \subsubsection{Constraints for Build Up Process}
 \label{sec:constraintsBUZone}
 
-There is no technical reason to restrict the number of ULDs that are
-built in parallel for a segment. However, in practice there might occur problems during
-a build-up when an item cannot be packed onto the planned ULD. In this case, the load
-planner has to find another ULD with enough remaining capacity under massive time
-pressure. The more ULDs that are not started yet, the more options and time he has
-for replanning. Furthermore, if only a few ULDs for a segment are built in parallel, they
-can be assigned to spatially close workstations. This might reduce transport distances
-and improve overview during build-up. We note that, during a period t, the ULDs that
-were started during period (t $-$ $dur_{k}$ $+$ 1) to period t are still work in progress. For each flight k we limit the number of simultaneously built ULDs by splitk as:
+There is no technical reason to restrict the number of ULDs that are built in parallel for a segment. However, in practice there might occur problems during
+a build-up when an item cannot be packed onto the planned ULD. In this case, the load planner has to find another ULD with enough remaining capacity under massive time pressure. The more ULDs that are not started yet, the more options and time he has for replanning. Furthermore, if only a few ULDs for a segment are built in parallel, they can be assigned to spatially close workstations. This might reduce transport distances and improve overview during build-up. We note that, during a period t, the ULDs that were started during period (t $-$ $dur_{k}$ $+$ 1) to period t are still work in progress. For each flight k we limit the number of simultaneously built ULDs by splitk as:
 
 \begin{align}
 \sum_{t' \in {T}} start_{kt'} \le split_{k} \qquad \forall k \in K, \forall t \in T
@@ -615,11 +591,7 @@ were started during period (t $-$ $dur_{k}$ $+$ 1) to period t are still work in
 
 $\newline$
 
-The number of usable workstations is limited. As each workstation
-can process one ULD at a time, we limit the number of simultaneously processed
-ULDs during period t by $open_{t}$. To calculate this number for a point in time,
-we sum up the ULDs of all flights that have been started during earlier periods and
-are not finished yet:
+The number of usable workstations is limited. As each workstation can process one ULD at a time, we limit the number of simultaneously processed ULDs during period t by $open_{t}$. To calculate this number for a point in time, we sum up the ULDs of all flights that have been started during earlier periods and are not finished yet:
 
 \begin{align}
 \sum_{k \in {K}}\sum_{t' \in {T}} start_{kt'} \le open_{t} \qquad \forall t \in T
@@ -627,7 +599,7 @@ are not finished yet:
 
 $\newline$
 
-\subsubsection{Objective Function}
+\subsection{Objective Function for Alternate model}
 \label{sec:objBUZone}
 
 While satisfying all the given constraints, we want to load as much cargo as possible. o maximize the load, we minimize the amount of weight the departing flight lost and the number of ULDs building up unassociated to the departing flight.
@@ -637,6 +609,33 @@ While satisfying all the given constraints, we want to load as much cargo as pos
 \end{equation*}
 
 $\newline$
+
+
+\section{Solution and Discussion}
+\label{sec:modeloutput}
+
+We implemented the model in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model, probably due to a very fine time discretization that we used (We can improve the time by using a coarse discretization of time as discussed). In the solution, we see that all shipments catch their flights on time as was our goal in this project. 
+
+$\newline$
+To choose a planning time horizon that fits our needs, we evaluated different planning time horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to discretize the time in handling time intervals for each BD zone. For the BU zones, time is discretized in one minute intervals.
+
+$\newline$
+When we analyze the result for the BD zones, we can see in both Figure 5 and Figure 6 that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{ShipmentArrivalTimeAndBDZones.jpeg}
+	\caption{Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+	\label{fig:Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+\end{figure}
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{FlightDepTimesAndBUZones.jpeg}
+	\caption{Flight Departure Times (X-axis) and BU Zones (Y-axis)}
+	\label{fig:Flight Departure Times (X-axis) and BU Zones (Y-axis)}
+\end{figure}
 
 %\subsection{Overall Model}
 %\label{sec:overallModel}
