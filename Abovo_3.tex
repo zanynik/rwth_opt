@@ -92,7 +92,7 @@
 
 \onehalfspacing
 \title{Optimizing Air Cargo Handling at an International Airline Hub for AbOvo \\} 
-\author{Ilkim Canoler \\ Luckshan Sivakumar \\  Nikhil Kulkarni \\ Karthikeyan Ramasubbu \\ Shekhar Dure}
+\author{Ilkim Canoler\thanks{\{ilkim.canoler@rwth-aachen.de, karthikeyan.ramasubbu@rwth-aachen.de, luckshan.sivakumar@rwth-aachen.de, nikhil.kulkarni@rwth-aachen.de, shekhar.dure@rwth.aachen.de\},M.Sc. Data Analytics and Decision Science, RWTH Aachen University, Germany}  \and Karthikeyan Ramasubbu\footnotemark[1] \and Luckshan Sivakumar\footnotemark[1] \and Nikhil Kulkarni \footnotemark[1] \and Shekhar Dure\footnotemark[1]} 
 $\newline$
 $\newline$
 \date{8th July 2019}
@@ -102,7 +102,10 @@ $\newline$
 
 $\newline$
 \begin{abstract}
-	In this study, we solve an operational planning problem in the air cargo industry. In an international airline hub, all shipments which arrive at the airport and have to go to another destination need to go through two processes, namely, breaking down of the ULD they arrived in and building up of ULD for their destination flight. The final goal is that all shipments have to catch their connection flight on time. Due to the complexity of the overall puzzle, current practices at airlines are to split up the puzzle into two smaller and thus simpler puzzles. The goal of this paper is to solve the full planning problem using a single model. Working with our industrial partner AbOvo, we provide a comprehensive overview of the air cargo planning problem. We formalize its requirements and the objectives. Furthermore, we develop and evaluate suitable solution approaches. We solve the full planning problem by using integer linear programming.
+	In this study, we solve an operational planning problem in the air cargo industry. In an international airline hub, all shipments which arrive at the airport and have to go to another destination need to go through two processes, namely, breaking down of the unit load devices (ULDs) that arrived in and building up of ULD for their destination flight. The final goal is that all shipments have to catch their connection flight on time. Due to the complexity of the overall problem, current practices at airlines are to split up the problem into two smaller and thus simpler problems. The goal of this paper is to solve the full planning problem using a single model. Working with our industrial partner AbOvo, we solved the problem of scheduling the break down and build up process according to the departure timings of the destination flights to ensure that all shipments reaches the flight. We formalize its requirements and the objectives. Furthermore, we develop and evaluate two different solution approaches. We solve the full planning problem by using integer linear programming.
+$\newline$
+
+\textbf{Keywords:} \textit{Time Discretization,}.
 	
 \end{abstract}
 
@@ -125,7 +128,7 @@ An international airline hub needs to plan the air cargo movement so that all sh
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=170mm,scale=1.5]{1_process.png}
+	\includegraphics[width=170mm,scale=1.5]{1_process.PNG}
 	\caption{The Process That Takes Place at a Hub}
 	\label{fig:The Process That Takes Place at a Hub}
 \end{figure}
@@ -240,7 +243,7 @@ The goal is to build up all ULDs before the given buffer time so that all can ca
 %\newpage
 
 
-\section{Mathematical Model}
+\section{Mathematical Model for the Problem}
 \label{sec:mathmodel}
 
 Our mathematical model for this problem is a combination of two puzzles namely, the Break Down Zone and the Build Up Zone assignments. The overall view of the general process can be seen in Figure 2 below.
@@ -298,13 +301,13 @@ $\textcolor{black}{x_{ij}^{t}\in\{0,1\}, \forall {i \in I, j \in J, t \in T}}$ :
 The first constraint (1) ensures that the ULD is assigned at a feasible time, the second constraint (2) ensures that all ULDs have to be assigned to exactly one BD zone.
 
 $\newline$
-The time at which Break down of  ULD i starts, $t_{i,start} = \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t . x_{ij}^t $
+The time at which Break down of  ULD i starts, $t_{i,start} = \sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} t \cdot x_{ij}^t $
 $\newline$
 $\newline$
 Each ULD takes i  $T_{ij}$ time to travel to its assigned BD zone j, therefore the following constraint ensures that the start time of ULD i is greater than the sum of its arrival time and transportation time :
 $\newline$
 \begin{align}
-\sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} (t- T_{ij}) . x_{ij}^t \ge a_{i} ,  \qquad \forall i \in I
+\sum_{j \in J}\sum_{t=a_{i}}^{d_{i}} (t- T_{ij}) \cdot x_{ij}^t \ge a_{i} ,  \qquad \forall i \in I
 \end{align}
 
 Each ULD i must be assigned to a BD zone j before the earliest departure time of the shipment it contains. We will further tighten this time limit in other constraints that follow. The following constraint ensures that each ULD is assigned : 
@@ -327,7 +330,7 @@ In the fifth consraint (5), we consider the case that for multiple drop zone ULD
 $J_{NML} \bigcup J_{NRML} = J$
 
 \begin{align}
-\sum_{j\in J_{NML}}\sum_{t=a_{i}}^{d_{i}} (t + h_{j}) . x_{ij}^t  \le \sum_{j\in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} (t) . x_{ij}^t
+\sum_{j\in J_{NML}}\sum_{t=a_{i}}^{d_{i}} (t + h_{j}) \cdot x_{ij}^t  \le \sum_{j\in J_{NRML}}\sum_{t=a_{i}}^{d_{i}} (t) \cdot x_{ij}^t
 \end{align}
 
 
@@ -356,7 +359,7 @@ Now, let's consider the journey of each shipment as in Figure 3 shown below. Eac
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=130mm,scale=1.5]{Marco.png}
+	\includegraphics[width=130mm,scale=1.5]{Marco.PNG}
 	\caption{Journey of Shipment}
 	\label{fig:Journey of Shipment}
 \end{figure}
@@ -407,13 +410,7 @@ If shipments in subset  $\textcolor{black}{l\in\ L_k }$ start at $\textcolor{bla
 $\newline$
 
 \begin{align}
-Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm}^{t}.w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pm}^{\tau}.w_l , \qquad \forall k \in K, \forall m \in M_k, \forall t \in T  
-\end{align}
-
-Tha above equation ensures that the capacity of a BU zone is not violated. The same equation can be simplifed if we initially discretize time in a coarse manner i.e instead of discretizing time in minutes, if we discretize time in handling time intervals of the BU zone and define the decision variable only at discretized time values, then we can rewrite the equations as follows:
-
-\begin{align}
-Q_{mk}^{t}.W - \sum_{l\in L_k}z_{lm}^{t}.w_l \ge 0 \qquad \forall t \in T, \forall j \in J
+Q_{mk}^{t}\cdot W - \sum_{l\in L_k}z_{lm}^{t}\cdot w_l \ge  \sum_{p\in L_k\setminus \{ l\}}            \sum_{\tau=t+1}^{t+b_k-1} z_{pm}^{\tau}\cdot w_l , \qquad \forall k \in K, \forall m \in M_k, \forall t \in T  
 \end{align}
 
 The above simplified form of equation ensures that at any given time t in the set T, which contains time values discretized according to handling time intervals, the capacity of BU zone is never violated.
@@ -447,26 +444,26 @@ In the entire timeline of a shipment from its arrival to departure as in Figure 
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=130mm,scale=1.5]{Marco_2.png}
+	\includegraphics[width=130mm,scale=1.5]{Marco_2.PNG}
 	\caption{Journey of Shipment - 2}
 	\label{fig:Journey of Shipment - 2}
 \end{figure}
 
 The end time of ULD i in Break down process and the summation of transportation time needed to reach Warehouse shall be less that the time at which the shipment l is assigned to a workstation 'm' in Build up zone of flight k.
 \begin{align}
- \sum_{j \in J}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t . t \qquad \forall i \in I , \forall l \in L_{i}
+ \sum_{j \in J}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} \cdot x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t \cdot t \qquad \forall i \in I , \forall l \in L_{i}
 \end{align}
 
 For Multiple DZ ULDs we have to consider only NRML BD zone assignments for writing precedence constraint : 
 
 \begin{align}
- \sum_{j \in J_{NRML}}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} . x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t . t \qquad \forall i \in I , \forall l \in L_{i}
+ \sum_{j \in J_{NRML}}\sum_{t=a_{l}}^{d_{i}}{\color{black}{(t + h_{j} + T_{j})}} \cdot x_{ij}^t  \le \sum_{m \in M_{k}}\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t \cdot t \qquad \forall i \in I , \forall l \in L_{i}
 \end{align}
 
 Slack for each shipment is given by difference in departure time and the time at which shipments are built up into ULDs. Let this slack time for each shipment be greater than ${s_{min}}$
 
 \begin{align}
- ( d_{l} + p_{k}) - (\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t .(t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
+ ( d_{l} + p_{k}) - (\sum_{t=a_{l}}^{d_{l}}z_{lm_{k}}^t \cdot (t + b_{k}) )  \ge s_{min} \qquad \forall i \in I, \forall l \in L_{i}, \forall k \in K, \forall t \in T
 \end{align}
 \begin{align}
 s_{min} \ge 0
@@ -614,27 +611,63 @@ $\newline$
 \section{Solution and Discussion}
 \label{sec:modeloutput}
 
-We implemented the model in Jupyter Notebook using Gurobi for Python. It takes three hours to build the entire model, probably due to a very fine time discretization that we used (We can improve the time by using a coarse discretization of time as discussed). In the solution, we see that all shipments catch their flights on time as was our goal in this project. 
+We implemented all above presented variables and constraints in python using Jupyter notebook. We checked the notebook in both Linux and Windows 64-bit operating systems and it compile without any errors in both. As a MIP solver we used Gurobi in version 8.1.0. For data cleaning Pandas(0.24.0) and Numpy(1.15.4) was used. All the graphs generated using matplotlib(3.0.2).
 
 $\newline$
-To choose a planning time horizon that fits our needs, we evaluated different planning time horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to discretize the time in handling time intervals for each BD zone. For the BU zones, time is discretized in one minute intervals.
+We perform our testing in two machines. One machine had Intel Core i7-4500U processor with 2 cores clocked at 1.8 GHz and equipped with 4 MB cache running on a 64-bit Ubuntu 18.04 lts. Another machine had Intel Core i7-6500U  processor with 2 cores clocked at 2.5 GHz and equipped with 4 MB cache running on a 64-bit Windows 10.  Each machine had 8 GB main memory and all the experiments were performed under full load.
 
 $\newline$
-When we analyze the result for the BD zones, we can see in both Figure 5 and Figure 6 that most of the shipments are assigned to BD zone called BD NRML-4. Because transportation time and the handling time for this particular BD zone are less than the others. Hence, our model picked the best BD zone. 
+First model takes three hours to build the entire model and for the second model takes around two hours to build entire model, probably due to a very fine time discretization that we used (We can improve the time by using a coarse discretization of time). In the solution, we see that all shipments catch their flights on time as was our goal in this project. To choose a planning time horizon that fits our needs, we evaluated different planning time horizons with repect to the solution quality and the runtime. For the BD zones, first we determined the planning horizon as one minute but it took a lot of time for the solution. Then we decided to discretize the time using handling time intervals for each BD zone. For the BU zones, time is discretized in one minute intervals.
+
+\subsection{Break down zone results}
+\label{sec:fmBDResults}
+The results for the BD zones are visualized in both Figure 5 and Figure 6. Most number of ULDs allocated to BD NRML-1 because transportation time and the handling time for this particular BD zone are less than the others. Similarly this is applied to the ULD which is containing animals. For this ULDs BD NML-3 was selected most. Hence, our model picked the best BD zone. As per the data we received it used only three normal break down zones and three animal break down zones. Other break down zones are not picked by our model for this data. 
 
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=150mm,scale=1.0]{ShipmentArrivalTimeAndBDZones.jpeg}
+	\includegraphics[width=150mm,scale=1.0]{bd_assignment.png}
 	\caption{Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
 	\label{fig:Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
 \end{figure}
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=150mm,scale=1.0]{FlightDepTimesAndBUZones.jpeg}
-	\caption{Flight Departure Times (X-axis) and BU Zones (Y-axis)}
-	\label{fig:Flight Departure Times (X-axis) and BU Zones (Y-axis)}
+	\includegraphics[width=150mm,scale=1.0]{Rplot_bd.png}
+	\caption{BD zones (X-axis) and ULD count (Y-axis)}
+	\label{fig:BD zones (X-axis) and ULD count (Y-axis)}
+\end{figure}
+
+$\newline$
+$\newline$
+\subsection{Build-up zone results - main model}
+\label{sec:fmBDResults}
+The results for the BD zones are visualized in both Figure 5 and Figure 6. Most number of ULDs allocated to BD NRML-1 because transportation time and the handling time for this particular BD zone are less than the others. Similarly this is applied to the ULD which is containing animals. For this ULDs BD NML-3 was selected most. Hence, our model picked the best BD zone. As per the data we received it used only three normal break down zones and three animal break down zones. Other break down zones are not picked by our model for this data.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{bu_assignment.png}
+	\caption{Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+	\label{fig:Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+\end{figure}
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{Rplot_bu.png}
+	\caption{BD zones (X-axis) and ULD count (Y-axis)}
+	\label{fig:BD zones (X-axis) and ULD count (Y-axis)}
+\end{figure}
+
+\pagebreak
+\subsection{Build-up zone results - alternative model}
+\label{sec:fmBDResults}
+The results for the BD zones are visualized in both Figure 5 and Figure 6. Most number of ULDs allocated to BD NRML-1 because transportation time and the handling time for this particular BD zone are less than the others. Similarly this is applied to the ULD which is containing animals. For this ULDs BD NML-3 was selected most. Hence, our model picked the best BD zone. As per the data we received it used only three normal break down zones and three animal break down zones. Other break down zones are not picked by our model for this data.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=150mm,scale=1.0]{al_model_2.png}
+	\caption{Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
+	\label{fig:Shipment Arrival Times (X-axis) and BD Zones (Y-axis)}
 \end{figure}
 
 %\subsection{Overall Model}

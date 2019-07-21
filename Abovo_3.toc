@@ -1,0 +1,18 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Problem Description}{2}{section.2}
+\contentsline {section}{\numberline {3}Mathematical Model for the Problem}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}Break Down Process}{4}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}Decision Variables for Break Down Process}{4}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Constraints for Break Down Process}{5}{subsubsection.3.1.2}
+\contentsline {subsection}{\numberline {3.2}Build Up Process}{6}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}Decision Variables for Build Up Process}{7}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Constraints for Build Up Process}{7}{subsubsection.3.2.2}
+\contentsline {subsection}{\numberline {3.3}Objective Function}{9}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Alternate Model for Build Up Process}{9}{subsection.3.4}
+\contentsline {subsubsection}{\numberline {3.4.1}Decision Variables for Build Up Process}{11}{subsubsection.3.4.1}
+\contentsline {subsubsection}{\numberline {3.4.2}Constraints for Build Up Process}{11}{subsubsection.3.4.2}
+\contentsline {subsection}{\numberline {3.5}Objective Function for Alternate model}{12}{subsection.3.5}
+\contentsline {section}{\numberline {4}Solution and Discussion}{12}{section.4}
+\contentsline {subsection}{\numberline {4.1}Break down zone results}{13}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Build-up zone results - main model}{13}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Build-up zone results - alternative model}{14}{subsection.4.3}

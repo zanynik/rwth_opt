@@ -1,0 +1,18 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Problem Description}{}% 2
+\BOOKMARK [1][-]{section.3}{Mathematical Model for the Problem}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Break Down Process}{section.3}% 4
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Decision Variables for Break Down Process}{subsection.3.1}% 5
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Constraints for Break Down Process}{subsection.3.1}% 6
+\BOOKMARK [2][-]{subsection.3.2}{Build Up Process}{section.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Decision Variables for Build Up Process}{subsection.3.2}% 8
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Constraints for Build Up Process}{subsection.3.2}% 9
+\BOOKMARK [2][-]{subsection.3.3}{Objective Function}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.4}{Alternate Model for Build Up Process}{section.3}% 11
+\BOOKMARK [3][-]{subsubsection.3.4.1}{Decision Variables for Build Up Process}{subsection.3.4}% 12
+\BOOKMARK [3][-]{subsubsection.3.4.2}{Constraints for Build Up Process}{subsection.3.4}% 13
+\BOOKMARK [2][-]{subsection.3.5}{Objective Function for Alternate model}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Solution and Discussion}{}% 15
+\BOOKMARK [2][-]{subsection.4.1}{Break down zone results}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.2}{Build-up zone results - main model}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.3}{Build-up zone results - alternative model}{section.4}% 18
